@@ -1,6 +1,5 @@
 
 import { useEffect, useRef } from "react";
-import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -49,7 +48,7 @@ const HeroSection = () => {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
             <Button
               size="lg"
-              className="w-full sm:w-auto text-md font-medium px-8 py-6 rounded-full shadow-lg transition-all duration-300 bg-primary hover:bg-primary/90 hover:shadow-xl hover:scale-105"
+              className="w-full sm:w-auto text-md font-medium px-8 py-6 rounded-full shadow-md transition-all duration-300 bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-lg"
             >
               Generate AI Art
             </Button>
@@ -69,8 +68,8 @@ const HeroSection = () => {
             <div 
               key={style} 
               className={cn(
-                "glass px-4 py-2 rounded-full text-sm font-medium text-foreground/90 animate-fade-in",
-                index % 2 === 0 ? "animate-pulse-gentle" : ""
+                "glass px-4 py-2 rounded-full text-sm font-medium text-foreground/90",
+                index % 2 === 0 ? "shadow-sm" : ""
               )}
               style={{ animationDelay: `${index * 0.2}s` }}
             >
@@ -78,11 +77,6 @@ const HeroSection = () => {
             </div>
           ))}
         </div>
-      </div>
-      
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-        <ChevronDown className="w-8 h-8 text-foreground/70" />
       </div>
     </section>
   );

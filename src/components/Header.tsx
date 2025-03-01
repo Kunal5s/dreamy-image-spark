@@ -38,7 +38,7 @@ const Header = () => {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 py-4 px-6 flex items-center justify-between transition-all duration-300",
         isScrolled
-          ? "bg-background/80 backdrop-blur-md shadow-sm"
+          ? "bg-background/90 backdrop-blur-md shadow-sm"
           : "bg-transparent"
       )}
     >
@@ -64,7 +64,7 @@ const Header = () => {
         </a>
         <div className="flex items-center gap-4">
           <ThemeToggle />
-          <Button size="sm" className="animate-pulse-gentle">
+          <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
             Sign In
           </Button>
         </div>
@@ -110,7 +110,7 @@ const Header = () => {
             >
               About
             </a>
-            <Button size="lg" className="mt-4 w-40">
+            <Button size="lg" className="mt-4 w-40 bg-primary text-primary-foreground hover:bg-primary/90">
               Sign In
             </Button>
           </nav>

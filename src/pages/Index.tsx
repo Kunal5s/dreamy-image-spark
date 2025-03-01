@@ -8,9 +8,9 @@ import FeaturesSection from "@/components/FeaturesSection";
 import Footer from "@/components/Footer";
 
 const Index = () => {
-  // Set dark mode by default
+  // Set light mode by default
   useEffect(() => {
-    document.documentElement.classList.add("dark");
+    document.documentElement.classList.remove("dark");
   }, []);
 
   return (
