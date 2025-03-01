@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Wand2,
   Image as ImageIcon,
@@ -12,7 +12,8 @@ import {
   Palette,
   Maximize,
   Settings,
-  Cpu 
+  Cpu,
+  AlertCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -34,6 +35,7 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useToast } from "@/hooks/use-toast";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 // API Key for Hugging Face
 const HF_API_KEY = "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";
@@ -90,14 +92,14 @@ const styles = [
 
 // Aspect ratio options
 const aspectRatios = [
-  { value: "1:1", label: "Square (1:1)", width: 1024, height: 1024 },
-  { value: "16:9", label: "Landscape (16:9)", width: 1280, height: 720 },
-  { value: "9:16", label: "Portrait (9:16)", width: 720, height: 1280 },
-  { value: "4:5", label: "Instagram (4:5)", width: 864, height: 1080 },
-  { value: "3:2", label: "Standard (3:2)", width: 1080, height: 720 },
-  { value: "21:9", label: "Ultrawide (21:9)", width: 1344, height: 576 },
-  { value: "2:3", label: "Portrait (2:3)", width: 720, height: 1080 },
-  { value: "4:3", label: "Classic (4:3)", width: 1024, height: 768 },
+  { value: "1:1", label: "Square (1:1)", width: 512, height: 512 },
+  { value: "16:9", label: "Landscape (16:9)", width: 640, height: 360 },
+  { value: "9:16", label: "Portrait (9:16)", width: 360, height: 640 },
+  { value: "4:5", label: "Instagram (4:5)", width: 432, height: 540 },
+  { value: "3:2", label: "Standard (3:2)", width: 512, height: 342 },
+  { value: "21:9", label: "Ultrawide (21:9)", width: 672, height: 288 },
+  { value: "2:3", label: "Portrait (2:3)", width: 342, height: 512 },
+  { value: "4:3", label: "Classic (4:3)", width: 512, height: 384 },
 ];
 
 const promptSuggestions = [
@@ -120,6 +122,34 @@ const ImageGenerator = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [currentTab, setCurrentTab] = useState("prompt");
+  const [error, setError] = useState("");
+  const [apiStatus, setApiStatus] = useState("");
+
+  // Test API connectivity on component mount
+  useEffect(() => {
+    const testApiConnection = async () => {
+      try {
+        const response = await fetch("https://api-inference.huggingface.co/models/stabilityai/sdxl-turbo", {
+          method: 'HEAD',
+          headers: {
+            'Authorization': `Bearer ${HF_API_KEY}`
+          }
+        });
+        
+        if (response.ok) {
+          setApiStatus("connected");
+        } else {
+          setApiStatus("error");
+          console.log("API connection test failed:", response.status);
+        }
+      } catch (err) {
+        setApiStatus("error");
+        console.error("API connection test error:", err);
+      }
+    };
+    
+    testApiConnection();
+  }, []);
 
   // Get the model endpoint based on selected model
   const getModelEndpoint = () => {
@@ -130,7 +160,7 @@ const ImageGenerator = () => {
   // Get dimensions based on selected aspect ratio
   const getDimensions = () => {
     const ratio = aspectRatios.find(r => r.value === aspectRatio);
-    return ratio ? { width: ratio.width, height: ratio.height } : { width: 1024, height: 1024 };
+    return ratio ? { width: ratio.width, height: ratio.height } : { width: 512, height: 512 };
   };
 
   // Function to generate image using Hugging Face API
@@ -146,6 +176,7 @@ const ImageGenerator = () => {
 
     setIsGenerating(true);
     setImageLoaded(false);
+    setError("");
     
     // Build the complete prompt with style
     const styleInfo = styles.find(s => s.value === selectedStyle);
@@ -155,6 +186,13 @@ const ImageGenerator = () => {
     try {
       const modelEndpoint = getModelEndpoint();
       const dimensions = getDimensions();
+      
+      console.log("Generating image with parameters:", {
+        model: modelEndpoint,
+        prompt: completePrompt,
+        dimensions,
+        steps: Math.floor(detailLevel[0] / 10) + 25
+      });
       
       // Make the actual API call to Hugging Face
       const response = await fetch(`https://api-inference.huggingface.co/models/${modelEndpoint}`, {
@@ -176,8 +214,19 @@ const ImageGenerator = () => {
       });
       
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Error generating image");
+        const errorText = await response.text();
+        console.error("Error response from API:", errorText);
+        
+        let errorMessage = "Failed to generate image";
+        try {
+          const errorJson = JSON.parse(errorText);
+          errorMessage = errorJson.error || errorJson.message || errorMessage;
+        } catch (e) {
+          // If it's not JSON, use the error text
+          errorMessage = errorText || errorMessage;
+        }
+        
+        throw new Error(errorMessage);
       }
       
       const imageBlob = await response.blob();
@@ -191,12 +240,15 @@ const ImageGenerator = () => {
       });
     } catch (error) {
       console.error("Error generating image:", error);
+      
+      setError(error instanceof Error ? error.message : "Connection to AI service failed. Please try again.");
+      setIsGenerating(false);
+      
       toast({
         title: "Error generating image",
-        description: error instanceof Error ? error.message : "Something went wrong. Please try again.",
+        description: error instanceof Error ? error.message : "Connection to AI service failed. Please try again.",
         variant: "destructive",
       });
-      setIsGenerating(false);
     }
   };
 
@@ -253,6 +305,12 @@ const ImageGenerator = () => {
     setImageLoaded(true);
   };
 
+  const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setPrompt(e.target.value);
+    // Clear error when user starts typing
+    if (error) setError("");
+  };
+
   return (
     <section id="generate" className="section-padding bg-background border-y border-border/30">
       <div className="container max-w-6xl">
@@ -262,6 +320,16 @@ const ImageGenerator = () => {
             Describe the image you want to create, select your preferences, and watch as AI brings your vision to life
           </p>
         </div>
+
+        {apiStatus === "error" && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Connection Error</AlertTitle>
+            <AlertDescription>
+              Unable to connect to the AI service. The API may be temporarily unavailable. Please try again later.
+            </AlertDescription>
+          </Alert>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           {/* Left Column - Controls */}
@@ -289,10 +357,13 @@ const ImageGenerator = () => {
                   </div>
                   <Textarea
                     placeholder="Describe the image you want to generate in detail..."
-                    className="resize-none h-32 bg-background/50"
+                    className={cn("resize-none h-32 bg-background/50", error && "border-red-500 focus-visible:ring-red-500")}
                     value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
+                    onChange={handlePromptChange}
                   />
+                  {error && (
+                    <p className="text-red-500 text-xs mt-1">{error}</p>
+                  )}
                 </div>
 
                 <div>
@@ -464,7 +535,7 @@ const ImageGenerator = () => {
                       alt="Generated AI art"
                       className={cn(
                         "w-full h-full object-cover transition-all duration-500",
-                        !imageLoaded ? "img-loading" : "img-loaded"
+                        !imageLoaded ? "opacity-0" : "opacity-100"
                       )}
                       onLoad={handleImageLoad}
                     />

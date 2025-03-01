@@ -11,6 +11,7 @@ const Index = () => {
   // Set light mode by default
   useEffect(() => {
     document.documentElement.classList.remove("dark");
+    document.documentElement.classList.add("light");
   }, []);
 
   return (
