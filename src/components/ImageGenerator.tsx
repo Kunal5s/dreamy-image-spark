@@ -35,25 +35,23 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useToast } from "@/hooks/use-toast";
 
-const placeholderImage = "/placeholder.svg";
-
 // API Key for Hugging Face
 const HF_API_KEY = "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";
 
-// Model options
+// Model options with their corresponding API endpoints
 const models = [
-  { value: "sdxl-turbo", label: "SDXL Turbo Pro" },
-  { value: "sdxl-1.5", label: "Stable Diffusion XL 1.5+" },
-  { value: "sd-lightning", label: "SD Lightning V2" },
-  { value: "realvisxl", label: "RealVisXL V4.0 UHD" },
-  { value: "dreamshaper", label: "DreamShaper XL Pro" },
-  { value: "deepfloyd", label: "DeepFloyd IF Ultra" },
-  { value: "controlnet", label: "ControlNet + SDXL" },
-  { value: "playground", label: "Playground V2.5 Ultra" },
-  { value: "julibrain", label: "JuliBrain Photoreal" },
-  { value: "pixart", label: "PixArt-Σ Ultra" },
-  { value: "openjourney", label: "OpenJourney V4 Pro" },
-  { value: "flux", label: "FLUX.1-schnell MAX" },
+  { value: "sdxl-turbo", label: "SDXL Turbo Pro", endpoint: "stabilityai/sdxl-turbo" },
+  { value: "sdxl-1.5", label: "Stable Diffusion XL 1.5+", endpoint: "stabilityai/stable-diffusion-xl-base-1.0" },
+  { value: "sd-lightning", label: "SD Lightning V2", endpoint: "ByteDance/SDXL-Lightning" },
+  { value: "realvisxl", label: "RealVisXL V4.0 UHD", endpoint: "SG161222/RealVisXL_V4.0" },
+  { value: "dreamshaper", label: "DreamShaper XL Pro", endpoint: "Lykon/dreamshaper-xl-1-0" },
+  { value: "deepfloyd", label: "DeepFloyd IF Ultra", endpoint: "DeepFloyd/IF-I-XL-v1.0" },
+  { value: "controlnet", label: "ControlNet + SDXL", endpoint: "diffusers/controlnet-canny-sdxl-1.0" },
+  { value: "playground", label: "Playground V2.5 Ultra", endpoint: "playgroundai/playground-v2.5-1024px-aesthetic" },
+  { value: "julibrain", label: "JuliBrain Photoreal", endpoint: "julien-c/julibrain-sd1" },
+  { value: "pixart", label: "PixArt-Σ Ultra", endpoint: "PixArt-alpha/PixArt-XL-2-1024-MS" },
+  { value: "openjourney", label: "OpenJourney V4 Pro", endpoint: "prompthero/openjourney-v4" },
+  { value: "flux", label: "FLUX.1-schnell MAX", endpoint: "stabilityai/stable-diffusion-2-1" },
 ];
 
 // Artistic styles options
@@ -92,14 +90,14 @@ const styles = [
 
 // Aspect ratio options
 const aspectRatios = [
-  { value: "1:1", label: "Square (1:1)" },
-  { value: "16:9", label: "Landscape (16:9)" },
-  { value: "9:16", label: "Portrait (9:16)" },
-  { value: "4:5", label: "Instagram (4:5)" },
-  { value: "3:2", label: "Standard (3:2)" },
-  { value: "21:9", label: "Ultrawide (21:9)" },
-  { value: "2:3", label: "Portrait (2:3)" },
-  { value: "4:3", label: "Classic (4:3)" },
+  { value: "1:1", label: "Square (1:1)", width: 1024, height: 1024 },
+  { value: "16:9", label: "Landscape (16:9)", width: 1280, height: 720 },
+  { value: "9:16", label: "Portrait (9:16)", width: 720, height: 1280 },
+  { value: "4:5", label: "Instagram (4:5)", width: 864, height: 1080 },
+  { value: "3:2", label: "Standard (3:2)", width: 1080, height: 720 },
+  { value: "21:9", label: "Ultrawide (21:9)", width: 1344, height: 576 },
+  { value: "2:3", label: "Portrait (2:3)", width: 720, height: 1080 },
+  { value: "4:3", label: "Classic (4:3)", width: 1024, height: 768 },
 ];
 
 const promptSuggestions = [
@@ -123,6 +121,18 @@ const ImageGenerator = () => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [currentTab, setCurrentTab] = useState("prompt");
 
+  // Get the model endpoint based on selected model
+  const getModelEndpoint = () => {
+    const model = models.find(m => m.value === selectedModel);
+    return model ? model.endpoint : "stabilityai/stable-diffusion-xl-base-1.0";
+  };
+
+  // Get dimensions based on selected aspect ratio
+  const getDimensions = () => {
+    const ratio = aspectRatios.find(r => r.value === aspectRatio);
+    return ratio ? { width: ratio.width, height: ratio.height } : { width: 1024, height: 1024 };
+  };
+
   // Function to generate image using Hugging Face API
   const generateImage = async () => {
     if (!prompt.trim()) {
@@ -143,10 +153,11 @@ const ImageGenerator = () => {
     const completePrompt = `${prompt}, ${styleName} style, highly detailed, professional quality`;
     
     try {
-      // For now, we'll use a mock API call since we don't have the actual endpoint
-      // In a real implementation, you would make an API call to Hugging Face
-      /*
-      const response = await fetch('https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0', {
+      const modelEndpoint = getModelEndpoint();
+      const dimensions = getDimensions();
+      
+      // Make the actual API call to Hugging Face
+      const response = await fetch(`https://api-inference.huggingface.co/models/${modelEndpoint}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${HF_API_KEY}`,
@@ -155,33 +166,34 @@ const ImageGenerator = () => {
         body: JSON.stringify({
           inputs: completePrompt,
           parameters: {
-            width: aspectRatio === "1:1" ? 1024 : 1280,
-            height: aspectRatio === "1:1" ? 1024 : aspectRatio === "16:9" ? 720 : 1024,
+            width: dimensions.width,
+            height: dimensions.height,
             num_inference_steps: Math.floor(detailLevel[0] / 10) + 25,
+            guidance_scale: 7.5,
+            negative_prompt: "low quality, worst quality, bad anatomy, bad composition, poor, low effort"
           }
         })
       });
       
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Error generating image");
+      }
+      
       const imageBlob = await response.blob();
       const imageUrl = URL.createObjectURL(imageBlob);
       setGeneratedImage(imageUrl);
-      */
+      setIsGenerating(false);
       
-      // Mock API call for demonstration
-      setTimeout(() => {
-        setGeneratedImage(placeholderImage);
-        setIsGenerating(false);
-        
-        toast({
-          title: "Image generated successfully!",
-          description: "Your AI artwork is ready to view.",
-        });
-      }, 2000);
+      toast({
+        title: "Image generated successfully!",
+        description: "Your AI artwork is ready to view.",
+      });
     } catch (error) {
       console.error("Error generating image:", error);
       toast({
         title: "Error generating image",
-        description: "Something went wrong. Please try again.",
+        description: error instanceof Error ? error.message : "Something went wrong. Please try again.",
         variant: "destructive",
       });
       setIsGenerating(false);
@@ -216,15 +228,25 @@ const ImageGenerator = () => {
   };
 
   const handleSaveImage = () => {
+    // In a real implementation, you would save the image to the user's gallery
     toast({
       description: "Image saved to your gallery",
     });
   };
 
   const handleDownloadImage = () => {
-    toast({
-      description: "Image downloaded successfully",
-    });
+    if (generatedImage) {
+      const link = document.createElement('a');
+      link.href = generatedImage;
+      link.download = `ai-generated-image-${Date.now()}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast({
+        description: "Image downloaded successfully",
+      });
+    }
   };
 
   const handleImageLoad = () => {
