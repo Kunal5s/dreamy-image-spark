@@ -18,6 +18,24 @@ export interface GenerateImageParams {
   lora?: string[];
 }
 
+export interface RunwareMessage {
+  taskType: string;
+  taskUUID: `${string}-${string}-${string}-${string}-${string}`;
+  model: string;
+  width: number;
+  height: number;
+  numberResults: number;
+  outputFormat: string;
+  steps: number;
+  CFGScale: number;
+  scheduler: string;
+  strength: number;
+  lora: string[];
+  positivePrompt: string;
+  seed?: number | string;
+  promptWeighting?: "compel" | "sdEmbeds" | "none";
+}
+
 export interface GeneratedImage {
   imageURL: string;
   positivePrompt: string;
@@ -26,16 +44,21 @@ export interface GeneratedImage {
 }
 
 export class RunwareService {
+  private _apiKey: string;
   private ws: WebSocket | null = null;
-  private apiKey: string | null = null;
   private connectionSessionUUID: string | null = null;
   private messageCallbacks: Map<string, (data: any) => void> = new Map();
   private isAuthenticated: boolean = false;
   private connectionPromise: Promise<void> | null = null;
 
   constructor(apiKey: string) {
-    this.apiKey = apiKey;
+    this._apiKey = apiKey;
     this.connectionPromise = this.connect();
+  }
+
+  // Getter for apiKey to allow comparison but not direct access
+  get apiKey(): string {
+    return this._apiKey;
   }
 
   private connect(): Promise<void> {
@@ -100,7 +123,7 @@ export class RunwareService {
       
       const authMessage = [{
         taskType: "authentication",
-        apiKey: this.apiKey,
+        apiKey: this._apiKey,
         ...(this.connectionSessionUUID && { connectionSessionUUID: this.connectionSessionUUID }),
       }];
       
@@ -132,7 +155,7 @@ export class RunwareService {
     const taskUUID = crypto.randomUUID();
     
     return new Promise((resolve, reject) => {
-      const message = [{
+      const message: RunwareMessage[] = [{
         taskType: "imageInference",
         taskUUID,
         model: params.model || "runware:100@1",
@@ -148,9 +171,7 @@ export class RunwareService {
         positivePrompt: params.positivePrompt,
       }];
 
-      if (!params.seed) {
-        delete message[0].seed;
-      } else {
+      if (params.seed) {
         message[0].seed = params.seed;
       }
 

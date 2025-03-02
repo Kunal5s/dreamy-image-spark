@@ -99,10 +99,9 @@ export const useImageActions = ({
   };
 
   const handleImageLoad = (index: number) => {
-    setImagesLoaded(prev => ({
-      ...prev,
-      [index]: true
-    }));
+    setImagesLoaded((prev) => {
+      return { ...prev, [index]: true };
+    });
   };
 
   const handleCopyPrompt = () => {
