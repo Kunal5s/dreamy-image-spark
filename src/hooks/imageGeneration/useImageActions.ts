@@ -1,7 +1,9 @@
+
 import { useState } from "react";
 import { toast } from "sonner";
-import { HF_API_KEY, styles } from "@/constants/imageGeneratorConstants";
-import { getModelEndpoint, getDimensions, calculateDetailLevel } from "./utils";
+import { styles } from "@/constants/imageGeneratorConstants";
+import { getDimensions } from "./utils";
+import { getRunwareService, GeneratedImage } from "@/services/runwareService";
 
 interface ImageActionsProps {
   prompt: string;
@@ -9,11 +11,14 @@ interface ImageActionsProps {
   selectedStyle: string;
   aspectRatio: string;
   detailLevel: number[];
-  generatedImage?: string;
-  setGeneratedImage: (url: string) => void;
+  generatedImages: string[];
+  setGeneratedImages: (urls: string[]) => void;
   setIsGenerating: (isGenerating: boolean) => void;
-  setImageLoaded: (isLoaded: boolean) => void;
+  setImagesLoaded: (loaded: Record<number, boolean>) => void;
   setError: (error: string) => void;
+  apiKey: string;
+  numberOfImages: number;
+  setSelectedImageIndex: (index: number) => void;
 }
 
 export const useImageActions = ({
@@ -22,22 +27,31 @@ export const useImageActions = ({
   selectedStyle,
   aspectRatio,
   detailLevel,
-  generatedImage = "",
-  setGeneratedImage,
+  generatedImages = [],
+  setGeneratedImages,
   setIsGenerating,
-  setImageLoaded,
-  setError
+  setImagesLoaded,
+  setError,
+  apiKey,
+  numberOfImages,
+  setSelectedImageIndex
 }: ImageActionsProps) => {
-  // Function to generate image using Hugging Face API
+  // Function to generate image using Runware API
   const generateImage = async () => {
     if (!prompt.trim()) {
       toast("Please enter a prompt - Your prompt will guide the AI to create your image");
       return;
     }
 
+    if (!apiKey.trim()) {
+      toast("Please enter your Runware API key in the settings tab");
+      return;
+    }
+
     setIsGenerating(true);
-    setImageLoaded(false);
+    setImagesLoaded({});
     setError("");
+    setSelectedImageIndex(0);
     
     // Build the complete prompt with style
     const styleInfo = styles.find(s => s.value === selectedStyle);
@@ -45,57 +59,35 @@ export const useImageActions = ({
     const completePrompt = `${prompt}, ${styleName} style, highly detailed, professional quality`;
     
     try {
-      const modelEndpoint = getModelEndpoint(selectedModel);
       const dimensions = getDimensions(aspectRatio);
       
-      console.log("Generating image with parameters:", {
-        model: modelEndpoint,
+      console.log("Generating images with parameters:", {
+        model: selectedModel,
         prompt: completePrompt,
         dimensions,
-        steps: calculateDetailLevel(detailLevel[0])
+        numberOfImages
       });
       
-      // Make the actual API call to Hugging Face
-      const response = await fetch(`https://api-inference.huggingface.co/models/${modelEndpoint}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${HF_API_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          inputs: completePrompt,
-          parameters: {
-            width: dimensions.width,
-            height: dimensions.height,
-            num_inference_steps: calculateDetailLevel(detailLevel[0]),
-            guidance_scale: 7.5,
-            negative_prompt: "low quality, worst quality, bad anatomy, bad composition, poor, low effort"
-          }
-        })
+      const runwareService = getRunwareService(apiKey);
+      
+      const generatedImages = await runwareService.generateImage({
+        positivePrompt: completePrompt,
+        model: selectedModel,
+        width: dimensions.width,
+        height: dimensions.height,
+        numberResults: numberOfImages,
+        CFGScale: detailLevel[0] / 10, // Convert detail level to CFG scale
       });
       
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Error response from API:", errorText);
-        
-        let errorMessage = "Failed to generate image";
-        try {
-          const errorJson = JSON.parse(errorText);
-          errorMessage = errorJson.error || errorJson.message || errorMessage;
-        } catch (e) {
-          // If it's not JSON, use the error text
-          errorMessage = errorText || errorMessage;
-        }
-        
-        throw new Error(errorMessage);
-      }
+      console.log("Generated images:", generatedImages);
       
-      const imageBlob = await response.blob();
-      const imageUrl = URL.createObjectURL(imageBlob);
-      setGeneratedImage(imageUrl);
+      // Extract image URLs from the response
+      const imageUrls = generatedImages.map((img: GeneratedImage) => img.imageURL);
+      
+      setGeneratedImages(imageUrls);
       setIsGenerating(false);
       
-      toast("Image generated successfully! Your AI artwork is ready to view.");
+      toast("Images generated successfully! Your AI artwork is ready to view.");
     } catch (error) {
       console.error("Error generating image:", error);
       
@@ -106,8 +98,11 @@ export const useImageActions = ({
     }
   };
 
-  const handleImageLoad = () => {
-    setImageLoaded(true);
+  const handleImageLoad = (index: number) => {
+    setImagesLoaded(prev => ({
+      ...prev,
+      [index]: true
+    }));
   };
 
   const handleCopyPrompt = () => {
@@ -115,15 +110,15 @@ export const useImageActions = ({
     toast("Prompt copied to clipboard");
   };
 
-  const handleSaveImage = () => {
+  const handleSaveImage = (index: number = 0) => {
     // In a real implementation, you would save the image to the user's gallery
     toast("Image saved to your gallery");
   };
 
-  const handleDownloadImage = () => {
-    if (generatedImage) {
+  const handleDownloadImage = (index: number = 0) => {
+    if (generatedImages.length > 0 && generatedImages[index]) {
       const link = document.createElement('a');
-      link.href = generatedImage;
+      link.href = generatedImages[index];
       link.download = `ai-generated-image-${Date.now()}.png`;
       document.body.appendChild(link);
       link.click();

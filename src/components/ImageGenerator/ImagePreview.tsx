@@ -1,42 +1,66 @@
 
 import { cn } from "@/lib/utils";
-import { Download, ImageIcon, Loader2, RefreshCw, Save, Sparkles } from "lucide-react";
+import { Download, ImageIcon, Loader2, RefreshCw, Save, Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ImagePreviewProps {
-  generatedImage: string;
+  generatedImages: string[];
   isGenerating: boolean;
-  imageLoaded: boolean;
+  imagesLoaded: Record<number, boolean>;
   aspectRatio: string;
   selectedStyle: string;
-  handleImageLoad: () => void;
-  handleSaveImage: () => void;
-  handleDownloadImage: () => void;
+  selectedImageIndex: number;
+  setSelectedImageIndex: (index: number) => void;
+  handleImageLoad: (index: number) => void;
+  handleSaveImage: (index?: number) => void;
+  handleDownloadImage: (index?: number) => void;
   generateImage: () => void;
 }
 
 const ImagePreview = ({
-  generatedImage,
+  generatedImages,
   isGenerating,
-  imageLoaded,
+  imagesLoaded,
   aspectRatio,
   selectedStyle,
+  selectedImageIndex,
+  setSelectedImageIndex,
   handleImageLoad,
   handleSaveImage,
   handleDownloadImage,
   generateImage
 }: ImagePreviewProps) => {
+  const hasMultipleImages = generatedImages.length > 1;
+  
+  const navigatePrevious = () => {
+    if (selectedImageIndex > 0) {
+      setSelectedImageIndex(selectedImageIndex - 1);
+    } else {
+      // Loop to the last image
+      setSelectedImageIndex(generatedImages.length - 1);
+    }
+  };
+  
+  const navigateNext = () => {
+    if (selectedImageIndex < generatedImages.length - 1) {
+      setSelectedImageIndex(selectedImageIndex + 1);
+    } else {
+      // Loop to the first image
+      setSelectedImageIndex(0);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-medium">Image Preview</h3>
-        {generatedImage && (
+        {generatedImages.length > 0 && (
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={handleSaveImage} className="bg-background/50">
+            <Button variant="outline" size="sm" onClick={() => handleSaveImage(selectedImageIndex)} className="bg-background/50">
               <Save className="h-4 w-4 mr-1" />
               Save
             </Button>
-            <Button variant="outline" size="sm" onClick={handleDownloadImage} className="bg-background/50">
+            <Button variant="outline" size="sm" onClick={() => handleDownloadImage(selectedImageIndex)} className="bg-background/50">
               <Download className="h-4 w-4 mr-1" />
               Download
             </Button>
@@ -57,7 +81,7 @@ const ImagePreview = ({
           aspectRatio === "4:3" && "aspect-[4/3]"
         )}
       >
-        {!generatedImage && !isGenerating ? (
+        {generatedImages.length === 0 && !isGenerating ? (
           <div className="text-center space-y-3 p-8">
             <ImageIcon className="h-12 w-12 mx-auto text-muted-foreground/50" />
             <p className="text-muted-foreground text-sm">
@@ -76,25 +100,69 @@ const ImagePreview = ({
           </div>
         ) : (
           <>
+            {/* Left navigation button for multi-image */}
+            {hasMultipleImages && (
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="absolute left-2 z-10 h-8 w-8 bg-background/70 hover:bg-background/90"
+                onClick={navigatePrevious}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+            )}
+            
+            {/* Current Image */}
             <img
-              src={generatedImage}
-              alt="Generated AI art"
+              src={generatedImages[selectedImageIndex]}
+              alt={`Generated AI art ${selectedImageIndex + 1}`}
               className={cn(
                 "w-full h-full object-cover transition-all duration-500",
-                !imageLoaded ? "opacity-0" : "opacity-100"
+                !imagesLoaded[selectedImageIndex] ? "opacity-0" : "opacity-100"
               )}
-              onLoad={handleImageLoad}
+              onLoad={() => handleImageLoad(selectedImageIndex)}
             />
-            {!imageLoaded && (
+            
+            {!imagesLoaded[selectedImageIndex] && (
               <div className="absolute inset-0 flex items-center justify-center">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            )}
+            
+            {/* Right navigation button for multi-image */}
+            {hasMultipleImages && (
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="absolute right-2 z-10 h-8 w-8 bg-background/70 hover:bg-background/90"
+                onClick={navigateNext}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            )}
+            
+            {/* Image indicator dots for multi-image */}
+            {hasMultipleImages && (
+              <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5">
+                {generatedImages.map((_, index) => (
+                  <button
+                    key={index}
+                    className={cn(
+                      "h-2 w-2 rounded-full transition-all",
+                      index === selectedImageIndex 
+                        ? "bg-primary" 
+                        : "bg-background/50 hover:bg-background/80"
+                    )}
+                    onClick={() => setSelectedImageIndex(index)}
+                  />
+                ))}
               </div>
             )}
           </>
         )}
       </div>
 
-      {generatedImage && (
+      {generatedImages.length > 0 && (
         <Button
           variant="outline"
           className="w-full bg-background/50"
@@ -102,7 +170,7 @@ const ImagePreview = ({
           disabled={isGenerating}
         >
           <RefreshCw className="mr-2 h-4 w-4" />
-          Regenerate with Same Settings
+          Generate New Images
         </Button>
       )}
     </div>

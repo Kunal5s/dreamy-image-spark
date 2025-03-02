@@ -18,14 +18,20 @@ export const useImageGeneration = (): ImageGenerationHook => {
     setAspectRatio,
     detailLevel,
     setDetailLevel,
-    generatedImage,
-    setGeneratedImage,
+    generatedImages,
+    setGeneratedImages,
     isGenerating,
     setIsGenerating,
-    imageLoaded,
-    setImageLoaded,
+    imagesLoaded,
+    setImagesLoaded,
     error,
-    setError
+    setError,
+    apiKey,
+    setApiKey,
+    numberOfImages,
+    setNumberOfImages,
+    selectedImageIndex,
+    setSelectedImageIndex
   } = useImageState();
 
   const {
@@ -40,11 +46,14 @@ export const useImageGeneration = (): ImageGenerationHook => {
     selectedStyle,
     aspectRatio,
     detailLevel,
-    generatedImage,
-    setGeneratedImage,
+    generatedImages,
+    setGeneratedImages,
     setIsGenerating,
-    setImageLoaded,
-    setError
+    setImagesLoaded,
+    setError,
+    apiKey,
+    numberOfImages,
+    setSelectedImageIndex
   });
 
   return {
@@ -58,11 +67,17 @@ export const useImageGeneration = (): ImageGenerationHook => {
     setAspectRatio,
     detailLevel,
     setDetailLevel,
-    generatedImage,
+    generatedImages,
     isGenerating,
-    imageLoaded,
+    imagesLoaded,
     error,
     apiStatus,
+    apiKey,
+    setApiKey,
+    numberOfImages,
+    setNumberOfImages,
+    selectedImageIndex,
+    setSelectedImageIndex,
     generateImage,
     handleImageLoad,
     handleCopyPrompt,

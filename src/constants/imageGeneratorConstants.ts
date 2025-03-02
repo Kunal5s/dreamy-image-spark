@@ -1,20 +1,21 @@
-// API Key for Hugging Face
+
+// API Key for Hugging Face - This is a placeholder, will be replaced by Runware API
 export const HF_API_KEY = "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";
 
-// Model options with their corresponding API endpoints
+// Model options with their corresponding values for Runware API
 export const models = [
-  { value: "sdxl-turbo", label: "SDXL Turbo Pro", endpoint: "stabilityai/sdxl-turbo" },
-  { value: "sdxl-1.5", label: "Stable Diffusion XL 1.5+", endpoint: "stabilityai/stable-diffusion-xl-base-1.0" },
-  { value: "sd-lightning", label: "SD Lightning V2", endpoint: "ByteDance/SDXL-Lightning" },
-  { value: "realvisxl", label: "RealVisXL V4.0 UHD", endpoint: "SG161222/RealVisXL_V4.0" },
-  { value: "dreamshaper", label: "DreamShaper XL Pro", endpoint: "Lykon/dreamshaper-xl-1-0" },
-  { value: "deepfloyd", label: "DeepFloyd IF Ultra", endpoint: "DeepFloyd/IF-I-XL-v1.0" },
-  { value: "controlnet", label: "ControlNet + SDXL", endpoint: "diffusers/controlnet-canny-sdxl-1.0" },
-  { value: "playground", label: "Playground V2.5 Ultra", endpoint: "playgroundai/playground-v2.5-1024px-aesthetic" },
-  { value: "julibrain", label: "JuliBrain Photoreal", endpoint: "julien-c/julibrain-sd1" },
-  { value: "pixart", label: "PixArt-Σ Ultra", endpoint: "PixArt-alpha/PixArt-XL-2-1024-MS" },
-  { value: "openjourney", label: "OpenJourney V4 Pro", endpoint: "prompthero/openjourney-v4" },
-  { value: "flux", label: "FLUX.1-schnell MAX", endpoint: "stabilityai/stable-diffusion-2-1" },
+  { value: "runware:100@1", label: "SDXL Turbo Pro", endpoint: "runware:100@1" },
+  { value: "runware:110@1", label: "Stable Diffusion XL 1.5+", endpoint: "runware:110@1" },
+  { value: "runware:120@1", label: "SD Lightning V2", endpoint: "runware:120@1" },
+  { value: "runware:130@1", label: "RealVisXL V4.0 UHD", endpoint: "runware:130@1" },
+  { value: "runware:140@1", label: "DreamShaper XL Pro", endpoint: "runware:140@1" },
+  { value: "runware:150@1", label: "DeepFloyd IF Ultra", endpoint: "runware:150@1" },
+  { value: "runware:160@1", label: "ControlNet + SDXL", endpoint: "runware:160@1" },
+  { value: "runware:200@1", label: "Playground V2.5 Ultra", endpoint: "runware:200@1" },
+  { value: "runware:210@1", label: "JuliBrain Photoreal", endpoint: "runware:210@1" },
+  { value: "runware:220@1", label: "PixArt-Σ Ultra", endpoint: "runware:220@1" },
+  { value: "runware:230@1", label: "OpenJourney V4 Pro", endpoint: "runware:230@1" },
+  { value: "runware:240@1", label: "FLUX.1-schnell MAX", endpoint: "runware:240@1" },
 ];
 
 // Artistic styles options
@@ -53,14 +54,14 @@ export const styles = [
 
 // Aspect ratio options
 export const aspectRatios = [
-  { value: "1:1", label: "Square (1:1)", width: 512, height: 512 },
-  { value: "16:9", label: "Landscape (16:9)", width: 640, height: 360 },
-  { value: "9:16", label: "Portrait (9:16)", width: 360, height: 640 },
-  { value: "4:5", label: "Instagram (4:5)", width: 432, height: 540 },
-  { value: "3:2", label: "Standard (3:2)", width: 512, height: 342 },
-  { value: "21:9", label: "Ultrawide (21:9)", width: 672, height: 288 },
-  { value: "2:3", label: "Portrait (2:3)", width: 342, height: 512 },
-  { value: "4:3", label: "Classic (4:3)", width: 512, height: 384 },
+  { value: "1:1", label: "Square (1:1)", width: 1024, height: 1024 },
+  { value: "16:9", label: "Landscape (16:9)", width: 1024, height: 576 },
+  { value: "9:16", label: "Portrait (9:16)", width: 576, height: 1024 },
+  { value: "4:5", label: "Instagram (4:5)", width: 820, height: 1024 },
+  { value: "3:2", label: "Standard (3:2)", width: 1024, height: 683 },
+  { value: "21:9", label: "Ultrawide (21:9)", width: 1024, height: 439 },
+  { value: "2:3", label: "Portrait (2:3)", width: 683, height: 1024 },
+  { value: "4:3", label: "Classic (4:3)", width: 1024, height: 768 },
 ];
 
 export const promptSuggestions = [
@@ -71,3 +72,15 @@ export const promptSuggestions = [
   "A cozy cabin in the mountains during autumn",
   "A portrait of a cyberpunk character with neon accents",
 ];
+
+// Number of images to generate options
+export const numberOptions = [
+  { value: 1, label: "1 Image" },
+  { value: 2, label: "2 Images" },
+  { value: 4, label: "4 Images" },
+  { value: 6, label: "6 Images" },
+  { value: 9, label: "9 Images" },
+];
+
+// Default Runware API Key - this should be replaced by user input
+export const DEFAULT_RUNWARE_API_KEY = "";

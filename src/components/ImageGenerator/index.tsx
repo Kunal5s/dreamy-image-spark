@@ -33,11 +33,17 @@ const ImageGenerator = () => {
     setAspectRatio,
     detailLevel,
     setDetailLevel,
-    generatedImage,
+    generatedImages,
     isGenerating,
-    imageLoaded,
+    imagesLoaded,
     error,
     apiStatus,
+    apiKey,
+    setApiKey,
+    numberOfImages,
+    setNumberOfImages,
+    selectedImageIndex,
+    setSelectedImageIndex,
     generateImage,
     handleImageLoad,
     handleCopyPrompt,
@@ -47,7 +53,6 @@ const ImageGenerator = () => {
 
   const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setPrompt(e.target.value);
-    // Clear error when user starts typing
   };
 
   const handleModelChange = (value: string) => {
@@ -64,6 +69,14 @@ const ImageGenerator = () => {
 
   const handleDetailLevelChange = (values: number[]) => {
     setDetailLevel(values);
+  };
+  
+  const handleApiKeyChange = (value: string) => {
+    setApiKey(value);
+  };
+  
+  const handleNumberOfImagesChange = (value: number) => {
+    setNumberOfImages(value);
   };
 
   const handlePromptSuggestion = (suggestion: string) => {
@@ -120,9 +133,13 @@ const ImageGenerator = () => {
                   selectedModel={selectedModel}
                   aspectRatio={aspectRatio}
                   detailLevel={detailLevel}
+                  apiKey={apiKey}
+                  numberOfImages={numberOfImages}
                   handleModelChange={handleModelChange}
                   handleAspectRatioChange={handleAspectRatioChange}
                   handleDetailLevelChange={handleDetailLevelChange}
+                  handleApiKeyChange={handleApiKeyChange}
+                  handleNumberOfImagesChange={handleNumberOfImagesChange}
                 />
               </TabsContent>
             </Tabs>
@@ -130,7 +147,7 @@ const ImageGenerator = () => {
             <Button
               className="w-full py-6 rounded-lg text-base font-medium transition-all duration-300 bg-primary hover:bg-primary/90 text-primary-foreground"
               onClick={generateImage}
-              disabled={isGenerating || !prompt.trim()}
+              disabled={isGenerating || !prompt.trim() || !apiKey.trim()}
             >
               {isGenerating ? (
                 <>
@@ -140,7 +157,7 @@ const ImageGenerator = () => {
               ) : (
                 <>
                   <Wand2 className="mr-2 h-5 w-5" />
-                  Generate Image
+                  Generate {numberOfImages > 1 ? `${numberOfImages} Images` : 'Image'}
                 </>
               )}
             </Button>
@@ -149,11 +166,13 @@ const ImageGenerator = () => {
           {/* Right Column - Image Preview */}
           <div className="lg:col-span-3 bg-card p-6 rounded-xl shadow-sm">
             <ImagePreview 
-              generatedImage={generatedImage}
+              generatedImages={generatedImages}
               isGenerating={isGenerating}
-              imageLoaded={imageLoaded}
+              imagesLoaded={imagesLoaded}
               aspectRatio={aspectRatio}
               selectedStyle={styles.find(s => s.value === selectedStyle)?.label || ""}
+              selectedImageIndex={selectedImageIndex}
+              setSelectedImageIndex={setSelectedImageIndex}
               handleImageLoad={handleImageLoad}
               handleSaveImage={handleSaveImage}
               handleDownloadImage={handleDownloadImage}

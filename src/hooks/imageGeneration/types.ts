@@ -1,29 +1,29 @@
 
-// Types for image generation functionality
-export interface ImageGenerationState {
+export interface ImageGenerationHook {
   prompt: string;
+  setPrompt: (prompt: string) => void;
   selectedModel: string;
+  setSelectedModel: (model: string) => void;
   selectedStyle: string;
+  setSelectedStyle: (style: string) => void;
   aspectRatio: string;
+  setAspectRatio: (ratio: string) => void;
   detailLevel: number[];
-  generatedImage: string;
+  setDetailLevel: (level: number[]) => void;
+  generatedImages: string[];
   isGenerating: boolean;
-  imageLoaded: boolean;
+  imagesLoaded: Record<number, boolean>;
   error: string;
   apiStatus: string;
-}
-
-export interface ImageGenerationActions {
-  setPrompt: (prompt: string) => void;
-  setSelectedModel: (model: string) => void;
-  setSelectedStyle: (style: string) => void;
-  setAspectRatio: (ratio: string) => void;
-  setDetailLevel: (level: number[]) => void;
+  apiKey: string;
+  setApiKey: (key: string) => void;
+  numberOfImages: number;
+  setNumberOfImages: (num: number) => void;
+  selectedImageIndex: number;
+  setSelectedImageIndex: (index: number) => void;
   generateImage: () => Promise<void>;
-  handleImageLoad: () => void;
+  handleImageLoad: (index: number) => void;
   handleCopyPrompt: () => void;
-  handleSaveImage: () => void;
-  handleDownloadImage: () => void;
+  handleSaveImage: (index?: number) => void;
+  handleDownloadImage: (index?: number) => void;
 }
-
-export type ImageGenerationHook = ImageGenerationState & ImageGenerationActions;
