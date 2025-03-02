@@ -56,11 +56,7 @@ export const useImageGeneration = () => {
   // Function to generate image using Hugging Face API
   const generateImage = async () => {
     if (!prompt.trim()) {
-      toast({
-        title: "Please enter a prompt",
-        description: "Your prompt will guide the AI to create your image",
-        variant: "destructive",
-      });
+      toast("Please enter a prompt - Your prompt will guide the AI to create your image");
       return;
     }
 
@@ -124,21 +120,14 @@ export const useImageGeneration = () => {
       setGeneratedImage(imageUrl);
       setIsGenerating(false);
       
-      toast({
-        title: "Image generated successfully!",
-        description: "Your AI artwork is ready to view.",
-      });
+      toast("Image generated successfully! Your AI artwork is ready to view.");
     } catch (error) {
       console.error("Error generating image:", error);
       
       setError(error instanceof Error ? error.message : "Connection to AI service failed. Please try again.");
       setIsGenerating(false);
       
-      toast({
-        title: "Error generating image",
-        description: error instanceof Error ? error.message : "Connection to AI service failed. Please try again.",
-        variant: "destructive",
-      });
+      toast("Error generating image - " + (error instanceof Error ? error.message : "Connection to AI service failed. Please try again."));
     }
   };
 
@@ -148,16 +137,12 @@ export const useImageGeneration = () => {
 
   const handleCopyPrompt = () => {
     navigator.clipboard.writeText(prompt);
-    toast({
-      description: "Prompt copied to clipboard",
-    });
+    toast("Prompt copied to clipboard");
   };
 
   const handleSaveImage = () => {
     // In a real implementation, you would save the image to the user's gallery
-    toast({
-      description: "Image saved to your gallery",
-    });
+    toast("Image saved to your gallery");
   };
 
   const handleDownloadImage = () => {
@@ -169,9 +154,7 @@ export const useImageGeneration = () => {
       link.click();
       document.body.removeChild(link);
       
-      toast({
-        description: "Image downloaded successfully",
-      });
+      toast("Image downloaded successfully");
     }
   };
 
