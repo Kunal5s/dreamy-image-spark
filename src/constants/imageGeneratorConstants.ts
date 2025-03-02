@@ -1,6 +1,5 @@
-
 // API Key for Hugging Face
-export const HF_API_KEY = "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";
+export const HF_API_KEY = "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";
 
 // Model options with their corresponding API endpoints
 export const models = [

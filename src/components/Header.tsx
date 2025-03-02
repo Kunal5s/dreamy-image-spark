@@ -1,121 +1,136 @@
 
-import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { useMediaQuery } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
-import ThemeToggle from "./ThemeToggle";
-import { cn } from "@/lib/utils";
+import ThemeToggle from "@/components/ThemeToggle";
+import { Menu, X } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Header = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  const { user, signInWithGoogle, logout, isAdmin } = useAuth();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-    if (!isMobileMenuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
   };
 
-  useEffect(() => {
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, []);
+  const menuItems = [
+    { name: "Home", path: "/" },
+    { name: "Blog", path: "/blog" },
+  ];
+
+  if (isAdmin) {
+    menuItems.push({ name: "Dashboard", path: "/dashboard" });
+  }
+
+  const handleSignIn = async () => {
+    await signInWithGoogle();
+  };
+
+  const handleSignOut = async () => {
+    await logout();
+  };
 
   return (
-    <header
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 py-4 px-6 flex items-center justify-between transition-all duration-300",
-        isScrolled
-          ? "bg-background/90 backdrop-blur-md shadow-sm"
-          : "bg-transparent"
-      )}
-    >
-      <div className="flex items-center gap-2">
-        <h1 className="text-xl font-medium tracking-tight">
-          Artify<span className="text-primary font-semibold">AI</span>
-        </h1>
+    <header className="bg-background border-b border-border/30 sticky top-0 z-50">
+      <div className="container max-w-6xl flex h-16 items-center justify-between">
+        <Link to="/" className="flex items-center space-x-2">
+          <span className="text-2xl font-bold tracking-tight">ArtifyAI</span>
+        </Link>
+
+        {isMobile ? (
+          <>
+            <div className="flex items-center space-x-2">
+              <ThemeToggle />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden"
+                onClick={toggleMenu}
+                aria-label="Toggle menu"
+              >
+                {isOpen ? <X /> : <Menu />}
+              </Button>
+            </div>
+            {isOpen && (
+              <div className="fixed inset-0 top-16 z-50 bg-background p-6 md:hidden">
+                <nav className="flex flex-col space-y-4">
+                  {menuItems.map((item) => (
+                    <Link
+                      key={item.name}
+                      to={item.path}
+                      className="text-foreground font-medium py-2 text-lg"
+                      onClick={toggleMenu}
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
+                  <div className="pt-4 mt-4 border-t border-border">
+                    {user ? (
+                      <div className="space-y-4">
+                        <div className="flex items-center space-x-2">
+                          {user.photoURL && (
+                            <img
+                              src={user.photoURL}
+                              alt={user.displayName || "User"}
+                              className="w-8 h-8 rounded-full"
+                            />
+                          )}
+                          <span className="font-medium">{user.displayName || user.email}</span>
+                        </div>
+                        <Button variant="outline" onClick={handleSignOut} className="w-full">
+                          Sign Out
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button onClick={handleSignIn} variant="outline" className="w-full">
+                        Sign In with Google
+                      </Button>
+                    )}
+                  </div>
+                </nav>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="flex items-center space-x-6">
+            <nav className="flex items-center space-x-6">
+              {menuItems.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.path}
+                  className="text-foreground/70 hover:text-foreground font-medium"
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </nav>
+            <div className="flex items-center space-x-2">
+              <ThemeToggle />
+              {user ? (
+                <div className="flex items-center space-x-2">
+                  {user.photoURL && (
+                    <img
+                      src={user.photoURL}
+                      alt={user.displayName || "User"}
+                      className="w-8 h-8 rounded-full"
+                    />
+                  )}
+                  <Button variant="outline" size="sm" onClick={handleSignOut}>
+                    Sign Out
+                  </Button>
+                </div>
+              ) : (
+                <Button variant="outline" size="sm" onClick={handleSignIn}>
+                  Sign In
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
       </div>
-
-      {/* Desktop Navigation */}
-      <nav className="hidden md:flex items-center space-x-8">
-        <a href="#home" className="text-sm font-medium hover:text-primary transition-colors">
-          Home
-        </a>
-        <a href="#generate" className="text-sm font-medium hover:text-primary transition-colors">
-          Create
-        </a>
-        <a href="#gallery" className="text-sm font-medium hover:text-primary transition-colors">
-          Gallery
-        </a>
-        <a href="#about" className="text-sm font-medium hover:text-primary transition-colors">
-          About
-        </a>
-        <div className="flex items-center gap-4">
-          <ThemeToggle />
-          <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
-            Sign In
-          </Button>
-        </div>
-      </nav>
-
-      {/* Mobile Menu Button */}
-      <div className="flex items-center gap-4 md:hidden">
-        <ThemeToggle />
-        <Button variant="ghost" size="icon" onClick={toggleMobileMenu} aria-label="Menu">
-          {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </Button>
-      </div>
-
-      {/* Mobile Navigation Overlay */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 top-16 z-40 bg-background md:hidden animate-fade-in">
-          <nav className="flex flex-col items-center justify-center h-full space-y-8">
-            <a
-              href="#home"
-              className="text-xl font-medium hover:text-primary transition-colors"
-              onClick={toggleMobileMenu}
-            >
-              Home
-            </a>
-            <a
-              href="#generate"
-              className="text-xl font-medium hover:text-primary transition-colors"
-              onClick={toggleMobileMenu}
-            >
-              Create
-            </a>
-            <a
-              href="#gallery"
-              className="text-xl font-medium hover:text-primary transition-colors"
-              onClick={toggleMobileMenu}
-            >
-              Gallery
-            </a>
-            <a
-              href="#about"
-              className="text-xl font-medium hover:text-primary transition-colors"
-              onClick={toggleMobileMenu}
-            >
-              About
-            </a>
-            <Button size="lg" className="mt-4 w-40 bg-primary text-primary-foreground hover:bg-primary/90">
-              Sign In
-            </Button>
-          </nav>
-        </div>
-      )}
     </header>
   );
 };
