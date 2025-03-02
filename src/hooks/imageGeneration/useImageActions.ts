@@ -14,7 +14,7 @@ interface ImageActionsProps {
   generatedImages: string[];
   setGeneratedImages: (urls: string[]) => void;
   setIsGenerating: (isGenerating: boolean) => void;
-  setImagesLoaded: (loaded: Record<number, boolean>) => void;
+  setImagesLoaded: React.Dispatch<React.SetStateAction<Record<number, boolean>>>;
   setError: (error: string) => void;
   apiKey: string;
   numberOfImages: number;
@@ -99,7 +99,7 @@ export const useImageActions = ({
   };
 
   const handleImageLoad = (index: number) => {
-    setImagesLoaded((prevState: Record<number, boolean>) => {
+    setImagesLoaded((prevState) => {
       return { ...prevState, [index]: true };
     });
   };
