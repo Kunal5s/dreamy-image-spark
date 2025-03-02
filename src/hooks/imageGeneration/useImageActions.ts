@@ -99,8 +99,8 @@ export const useImageActions = ({
   };
 
   const handleImageLoad = (index: number) => {
-    setImagesLoaded((prev) => {
-      return { ...prev, [index]: true };
+    setImagesLoaded((prevState: Record<number, boolean>) => {
+      return { ...prevState, [index]: true };
     });
   };
 

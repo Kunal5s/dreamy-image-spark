@@ -175,8 +175,8 @@ export class RunwareService {
         message[0].seed = params.seed;
       }
 
-      if (message[0].model === "runware:100@1") {
-        message[0].promptWeighting = "none";
+      if (params.promptWeighting && message[0].model !== "runware:100@1") {
+        message[0].promptWeighting = params.promptWeighting;
       }
 
       console.log("Sending image generation message:", message);
