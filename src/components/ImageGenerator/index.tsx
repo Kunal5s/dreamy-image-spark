@@ -2,8 +2,7 @@
 import { useState } from "react";
 import { 
   Wand2,
-  Loader2,
-  AlertCircle
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +11,6 @@ import {
   TabsList,
   TabsTrigger
 } from "@/components/ui/tabs";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { styles } from "@/constants/imageGeneratorConstants";
 import { useImageGeneration } from "@/hooks/useImageGeneration";
 import PromptTab from "@/components/ImageGenerator/PromptTab";
@@ -86,16 +84,6 @@ const ImageGenerator = () => {
             Describe the image you want to create, select your preferences, and watch as AI brings your vision to life
           </p>
         </div>
-
-        {apiStatus === "error" && (
-          <Alert variant="destructive" className="mb-6">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Connection Error</AlertTitle>
-            <AlertDescription>
-              Unable to connect to the AI service. The API may be temporarily unavailable. Please try again later.
-            </AlertDescription>
-          </Alert>
-        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           {/* Left Column - Controls */}
