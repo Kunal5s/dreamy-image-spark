@@ -15,8 +15,6 @@ export interface ImageGenerationHook {
   imagesLoaded: Record<number, boolean>;
   error: string;
   apiStatus: string;
-  apiKey: string;
-  setApiKey: (key: string) => void;
   numberOfImages: number;
   setNumberOfImages: (num: number) => void;
   selectedImageIndex: number;
