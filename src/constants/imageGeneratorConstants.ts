@@ -1,6 +1,5 @@
-
-// API Key for Hugging Face - This is a placeholder, will be replaced by Runware API
-export const HF_API_KEY = "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";
+// API Key for Hugging Face - Updated with new key for high quality image generation
+export const HF_API_KEY = "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";
 
 // Model options with their corresponding values for Runware API
 export const models = [
@@ -18,7 +17,7 @@ export const models = [
   { value: "runware:240@1", label: "FLUX.1-schnell MAX", endpoint: "runware:240@1" },
 ];
 
-// Artistic styles options
+// Artistic styles options - Extended with more options
 export const styles = [
   { value: "hyper-realistic", label: "Hyper-Realistic" },
   { value: "abstract", label: "Abstract Art" },
@@ -50,6 +49,28 @@ export const styles = [
   { value: "architectural", label: "Architectural Visualization" },
   { value: "nature", label: "Nature Photography" },
   { value: "baroque", label: "Baroque" },
+  { value: "neon", label: "Neon Futuristic" },
+  { value: "vintage", label: "Vintage Photography" },
+  { value: "polaroid", label: "Polaroid Style" },
+  { value: "oil-painting", label: "Oil Painting" },
+  { value: "studio-ghibli", label: "Studio Ghibli" },
+  { value: "vector", label: "Vector Art" },
+  { value: "gothic", label: "Gothic Art" },
+  { value: "pencil-sketch", label: "Pencil Sketch" },
+  { value: "stained-glass", label: "Stained Glass" },
+  { value: "impressionist", label: "Impressionist" },
+  { value: "mosaic", label: "Digital Mosaic" },
+  { value: "ukiyo-e", label: "Ukiyo-e Japanese" },
+  { value: "graffiti", label: "Urban Graffiti" },
+  { value: "noir", label: "Film Noir" },
+  { value: "holographic", label: "Holographic" },
+  { value: "synthwave", label: "Synthwave" },
+  { value: "dieselpunk", label: "Dieselpunk" },
+  { value: "brutalist", label: "Brutalist" },
+  { value: "fractal", label: "Fractal Art" },
+  { value: "bauhaus", label: "Bauhaus" },
+  { value: "glitch", label: "Digital Glitch" },
+  { value: "deco", label: "Art Deco" },
 ];
 
 // Aspect ratio options
@@ -64,6 +85,7 @@ export const aspectRatios = [
   { value: "4:3", label: "Classic (4:3)", width: 1024, height: 768 },
 ];
 
+// Extended prompt suggestions for better user guidance
 export const promptSuggestions = [
   "A serene Japanese garden with cherry blossoms and a small pond",
   "Futuristic cityscape with flying vehicles and neon lights",
@@ -71,15 +93,23 @@ export const promptSuggestions = [
   "An underwater city with bioluminescent architecture",
   "A cozy cabin in the mountains during autumn",
   "A portrait of a cyberpunk character with neon accents",
+  "Ancient temple ruins overgrown with luminescent vines",
+  "A steampunk airship hovering over Victorian London",
+  "Crystalline palace with rainbow light reflections",
+  "Desert oasis with impossibly tall palm trees at sunset",
+  "A cosmic space station orbiting a multicolored nebula",
+  "Floating islands with waterfalls cascading into the sky",
+  "A dreamlike surrealist landscape with melting clocks",
 ];
 
-// Number of images to generate options
+// Number of images to generate options - Extended with more options
 export const numberOptions = [
   { value: 1, label: "1 Image" },
   { value: 2, label: "2 Images" },
   { value: 4, label: "4 Images" },
   { value: 6, label: "6 Images" },
   { value: 9, label: "9 Images" },
+  { value: 12, label: "12 Images" },
 ];
 
 // Default Runware API Key - this should be replaced by user input

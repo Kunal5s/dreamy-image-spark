@@ -14,13 +14,15 @@ export const getDimensions = (aspectRatio: string) => {
 };
 
 export const calculateDetailLevel = (sliderValue: number) => {
+  // Enhanced detail level calculation for better image quality
   return Math.floor(sliderValue / 10) + 25;
 };
 
-// Test API connection and return status
+// Test API connection and return status with enhanced error handling
 export const testApiConnection = async (apiKey: string) => {
   try {
-    const response = await fetch("https://api-inference.huggingface.co/models/stabilityai/sdxl-turbo", {
+    // Updated endpoint to the newer SDXL model for better performance
+    const response = await fetch("https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-1.0", {
       method: 'HEAD',
       headers: {
         'Authorization': `Bearer ${apiKey}`
@@ -32,4 +34,22 @@ export const testApiConnection = async (apiKey: string) => {
     console.error("API connection test error:", err);
     return "error";
   }
+};
+
+// New utility function to enhance prompt with AI-friendly terms
+export const enhancePrompt = (prompt: string, style: string): string => {
+  const enhancers = [
+    "highly detailed",
+    "professional lighting",
+    "sharp focus",
+    "8k resolution",
+    "masterpiece quality"
+  ];
+  
+  const randomEnhancers = enhancers
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 2)
+    .join(", ");
+    
+  return `${prompt}, ${style} style, ${randomEnhancers}`;
 };

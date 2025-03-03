@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { styles } from "@/constants/imageGeneratorConstants";
-import { getDimensions } from "./utils";
+import { getDimensions, enhancePrompt } from "./utils";
 import { getRunwareService, GeneratedImage } from "@/services/runwareService";
 
 interface ImageActionsProps {
@@ -44,7 +44,7 @@ export const useImageActions = ({
     }
 
     if (!apiKey.trim()) {
-      toast("Please enter your Runware API key in the settings tab");
+      toast("Please enter your API key in the settings tab");
       return;
     }
 
@@ -53,10 +53,10 @@ export const useImageActions = ({
     setError("");
     setSelectedImageIndex(0);
     
-    // Build the complete prompt with style
+    // Build the complete prompt with style using the new enhancer
     const styleInfo = styles.find(s => s.value === selectedStyle);
     const styleName = styleInfo ? styleInfo.label : "Hyper-Realistic";
-    const completePrompt = `${prompt}, ${styleName} style, highly detailed, professional quality`;
+    const completePrompt = enhancePrompt(prompt, styleName);
     
     try {
       const dimensions = getDimensions(aspectRatio);
@@ -99,7 +99,7 @@ export const useImageActions = ({
   };
 
   const handleImageLoad = (index: number) => {
-    setImagesLoaded((prevState) => {
+    setImagesLoaded((prevState: Record<number, boolean>) => {
       return { ...prevState, [index]: true };
     });
   };

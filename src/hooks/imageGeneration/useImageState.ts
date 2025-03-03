@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { HF_API_KEY } from "@/constants/imageGeneratorConstants";
 
 export const useImageState = () => {
   const [prompt, setPrompt] = useState("");
@@ -11,7 +12,8 @@ export const useImageState = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [imagesLoaded, setImagesLoaded] = useState<Record<number, boolean>>({});
   const [error, setError] = useState("");
-  const [apiKey, setApiKey] = useState("");
+  // Initialize with the Hugging Face API key for easier user experience
+  const [apiKey, setApiKey] = useState(HF_API_KEY);
   const [numberOfImages, setNumberOfImages] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
