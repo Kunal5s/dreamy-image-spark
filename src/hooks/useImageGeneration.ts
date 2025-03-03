@@ -26,8 +26,6 @@ export const useImageGeneration = (): ImageGenerationHook => {
     setImagesLoaded,
     error,
     setError,
-    apiKey,
-    setApiKey,
     numberOfImages,
     setNumberOfImages,
     selectedImageIndex,
@@ -51,7 +49,6 @@ export const useImageGeneration = (): ImageGenerationHook => {
     setIsGenerating,
     setImagesLoaded,
     setError,
-    apiKey,
     numberOfImages,
     setSelectedImageIndex
   });
@@ -72,8 +69,6 @@ export const useImageGeneration = (): ImageGenerationHook => {
     imagesLoaded,
     error,
     apiStatus,
-    apiKey,
-    setApiKey,
     numberOfImages,
     setNumberOfImages,
     selectedImageIndex,

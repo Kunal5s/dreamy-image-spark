@@ -38,8 +38,6 @@ const ImageGenerator = () => {
     imagesLoaded,
     error,
     apiStatus,
-    apiKey,
-    setApiKey,
     numberOfImages,
     setNumberOfImages,
     selectedImageIndex,
@@ -69,10 +67,6 @@ const ImageGenerator = () => {
 
   const handleDetailLevelChange = (values: number[]) => {
     setDetailLevel(values);
-  };
-  
-  const handleApiKeyChange = (value: string) => {
-    setApiKey(value);
   };
   
   const handleNumberOfImagesChange = (value: number) => {
@@ -133,12 +127,10 @@ const ImageGenerator = () => {
                   selectedModel={selectedModel}
                   aspectRatio={aspectRatio}
                   detailLevel={detailLevel}
-                  apiKey={apiKey}
                   numberOfImages={numberOfImages}
                   handleModelChange={handleModelChange}
                   handleAspectRatioChange={handleAspectRatioChange}
                   handleDetailLevelChange={handleDetailLevelChange}
-                  handleApiKeyChange={handleApiKeyChange}
                   handleNumberOfImagesChange={handleNumberOfImagesChange}
                 />
               </TabsContent>
@@ -147,7 +139,7 @@ const ImageGenerator = () => {
             <Button
               className="w-full py-6 rounded-lg text-base font-medium transition-all duration-300 bg-primary hover:bg-primary/90 text-primary-foreground"
               onClick={generateImage}
-              disabled={isGenerating || !prompt.trim() || !apiKey.trim()}
+              disabled={isGenerating || !prompt.trim()}
             >
               {isGenerating ? (
                 <>

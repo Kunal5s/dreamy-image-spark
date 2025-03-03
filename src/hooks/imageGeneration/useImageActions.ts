@@ -1,7 +1,6 @@
-
 import { useState } from "react";
 import { toast } from "sonner";
-import { styles } from "@/constants/imageGeneratorConstants";
+import { styles, HF_API_KEY } from "@/constants/imageGeneratorConstants";
 import { getDimensions, enhancePrompt } from "./utils";
 import { getRunwareService, GeneratedImage } from "@/services/runwareService";
 
@@ -16,7 +15,6 @@ interface ImageActionsProps {
   setIsGenerating: (isGenerating: boolean) => void;
   setImagesLoaded: React.Dispatch<React.SetStateAction<Record<number, boolean>>>;
   setError: (error: string) => void;
-  apiKey: string;
   numberOfImages: number;
   setSelectedImageIndex: (index: number) => void;
 }
@@ -32,7 +30,6 @@ export const useImageActions = ({
   setIsGenerating,
   setImagesLoaded,
   setError,
-  apiKey,
   numberOfImages,
   setSelectedImageIndex
 }: ImageActionsProps) => {
@@ -40,11 +37,6 @@ export const useImageActions = ({
   const generateImage = async () => {
     if (!prompt.trim()) {
       toast("Please enter a prompt - Your prompt will guide the AI to create your image");
-      return;
-    }
-
-    if (!apiKey.trim()) {
-      toast("Please enter your API key in the settings tab");
       return;
     }
 
@@ -68,7 +60,8 @@ export const useImageActions = ({
         numberOfImages
       });
       
-      const runwareService = getRunwareService(apiKey);
+      // Using the fixed API key from constants
+      const runwareService = getRunwareService(HF_API_KEY);
       
       const generatedImages = await runwareService.generateImage({
         positivePrompt: completePrompt,

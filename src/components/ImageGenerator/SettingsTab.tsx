@@ -3,7 +3,6 @@ import {
   Cpu,
   Maximize,
   Settings,
-  Key,
   Grid
 } from "lucide-react";
 import { 
@@ -13,7 +12,6 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { models, aspectRatios, numberOptions } from "@/constants/imageGeneratorConstants";
 
@@ -21,12 +19,10 @@ interface SettingsTabProps {
   selectedModel: string;
   aspectRatio: string;
   detailLevel: number[];
-  apiKey: string;
   numberOfImages: number;
   handleModelChange: (value: string) => void;
   handleAspectRatioChange: (value: string) => void;
   handleDetailLevelChange: (values: number[]) => void;
-  handleApiKeyChange: (value: string) => void;
   handleNumberOfImagesChange: (value: number) => void;
 }
 
@@ -34,35 +30,14 @@ const SettingsTab = ({
   selectedModel,
   aspectRatio,
   detailLevel,
-  apiKey,
   numberOfImages,
   handleModelChange,
   handleAspectRatioChange,
   handleDetailLevelChange,
-  handleApiKeyChange,
   handleNumberOfImagesChange
 }: SettingsTabProps) => {
   return (
     <div className="space-y-4 mt-2">
-      <div className="space-y-3">
-        <div className="flex items-center gap-2">
-          <Key className="h-4 w-4 text-muted-foreground" />
-          <label className="text-sm font-medium">Runware API Key</label>
-        </div>
-        <Input
-          type="password"
-          placeholder="Enter your Runware API key"
-          value={apiKey}
-          onChange={(e) => handleApiKeyChange(e.target.value)}
-          className="bg-background/50"
-        />
-        <div className="text-xs text-muted-foreground">
-          <a href="https://runware.ai/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-            Get your API key from Runware.ai
-          </a>
-        </div>
-      </div>
-
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           <Cpu className="h-4 w-4 text-muted-foreground" />
