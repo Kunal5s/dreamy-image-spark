@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { styles, HF_API_KEY } from "@/constants/imageGeneratorConstants";
+import { styles } from "@/constants/imageGeneratorConstants";
 import { getDimensions, enhancePrompt } from "./utils";
 import { getRunwareService, GeneratedImage } from "@/services/runwareService";
 
@@ -61,8 +61,8 @@ export const useImageActions = ({
         numberOfImages
       });
       
-      // Using the fixed API key from constants
-      const runwareService = getRunwareService(HF_API_KEY);
+      // Using the RunwareService singleton without API key parameter
+      const runwareService = getRunwareService();
       
       // Set a timeout to prevent long waits
       const timeoutPromise = new Promise<GeneratedImage[]>((_, reject) => {

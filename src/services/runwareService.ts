@@ -1,4 +1,5 @@
 
+import { HF_API_KEY } from "@/constants/imageGeneratorConstants";
 import { getImageGenerationService, GenerateImageParams, GeneratedImage } from "./runware/imageGenerationService";
 
 export type { GenerateImageParams, GeneratedImage } from "./runware/imageGenerationService";
@@ -6,12 +7,8 @@ export type { GenerateImageParams, GeneratedImage } from "./runware/imageGenerat
 export class RunwareService {
   private imageGenerationService: ReturnType<typeof getImageGenerationService>;
 
-  constructor(apiKey: string) {
-    this.imageGenerationService = getImageGenerationService(apiKey);
-  }
-
-  get apiKey(): string {
-    return this.imageGenerationService.apiKey;
+  constructor() {
+    this.imageGenerationService = getImageGenerationService(HF_API_KEY);
   }
 
   async generateImage(params: GenerateImageParams): Promise<GeneratedImage[]> {
@@ -22,9 +19,9 @@ export class RunwareService {
 // Singleton instance
 let runwareServiceInstance: RunwareService | null = null;
 
-export const getRunwareService = (apiKey: string): RunwareService => {
-  if (!runwareServiceInstance || runwareServiceInstance.apiKey !== apiKey) {
-    runwareServiceInstance = new RunwareService(apiKey);
+export const getRunwareService = (): RunwareService => {
+  if (!runwareServiceInstance) {
+    runwareServiceInstance = new RunwareService();
   }
   return runwareServiceInstance;
 };

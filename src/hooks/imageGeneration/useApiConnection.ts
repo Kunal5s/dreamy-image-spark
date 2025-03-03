@@ -1,11 +1,10 @@
 
 import { useState, useEffect } from "react";
-import { HF_API_KEY } from "@/constants/imageGeneratorConstants";
 
 export const useApiConnection = () => {
-  const [apiStatus, setApiStatus] = useState("connected"); // Always start with connected status
+  const [apiStatus, setApiStatus] = useState("connected"); 
 
-  // We're no longer testing the API connection since we're assuming it's always available
+  // Always set to connected status without any tests
   useEffect(() => {
     setApiStatus("connected");
   }, []);
