@@ -5,12 +5,10 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import ThemeToggle from "@/components/ThemeToggle";
 import { Menu, X } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useIsMobile();
-  const { user, signInWithGoogle, logout, isAdmin } = useAuth();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -20,18 +18,6 @@ const Header = () => {
     { name: "Home", path: "/" },
     { name: "Blog", path: "/blog" },
   ];
-
-  if (isAdmin) {
-    menuItems.push({ name: "Dashboard", path: "/dashboard" });
-  }
-
-  const handleSignIn = async () => {
-    await signInWithGoogle();
-  };
-
-  const handleSignOut = async () => {
-    await logout();
-  };
 
   return (
     <header className="bg-background border-b border-border/30 sticky top-0 z-50">
@@ -67,29 +53,6 @@ const Header = () => {
                       {item.name}
                     </Link>
                   ))}
-                  <div className="pt-4 mt-4 border-t border-border">
-                    {user ? (
-                      <div className="space-y-4">
-                        <div className="flex items-center space-x-2">
-                          {user.photoURL && (
-                            <img
-                              src={user.photoURL}
-                              alt={user.displayName || "User"}
-                              className="w-8 h-8 rounded-full"
-                            />
-                          )}
-                          <span className="font-medium">{user.displayName || user.email}</span>
-                        </div>
-                        <Button variant="outline" onClick={handleSignOut} className="w-full">
-                          Sign Out
-                        </Button>
-                      </div>
-                    ) : (
-                      <Button onClick={handleSignIn} variant="outline" className="w-full">
-                        Sign In with Google
-                      </Button>
-                    )}
-                  </div>
                 </nav>
               </div>
             )}
@@ -107,26 +70,8 @@ const Header = () => {
                 </Link>
               ))}
             </nav>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center">
               <ThemeToggle />
-              {user ? (
-                <div className="flex items-center space-x-2">
-                  {user.photoURL && (
-                    <img
-                      src={user.photoURL}
-                      alt={user.displayName || "User"}
-                      className="w-8 h-8 rounded-full"
-                    />
-                  )}
-                  <Button variant="outline" size="sm" onClick={handleSignOut}>
-                    Sign Out
-                  </Button>
-                </div>
-              ) : (
-                <Button variant="outline" size="sm" onClick={handleSignIn}>
-                  Sign In
-                </Button>
-              )}
             </div>
           </div>
         )}

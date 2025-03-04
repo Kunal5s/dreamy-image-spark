@@ -1,4 +1,5 @@
 
+import { HF_API_KEY } from "@/constants/imageGeneratorConstants";
 import { getWebSocketService } from "./websocketService";
 
 export class AuthService {
