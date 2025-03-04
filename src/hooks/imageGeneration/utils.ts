@@ -18,24 +18,6 @@ export const calculateDetailLevel = (sliderValue: number) => {
   return Math.floor(sliderValue / 10) + 25;
 };
 
-// Test API connection and return status with enhanced error handling
-export const testApiConnection = async (apiKey: string) => {
-  try {
-    // Updated endpoint to the newer SDXL model for better performance
-    const response = await fetch("https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-1.0", {
-      method: 'HEAD',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`
-      }
-    });
-    
-    return response.ok ? "connected" : "error";
-  } catch (err) {
-    console.error("API connection test error:", err);
-    return "error";
-  }
-};
-
 // New utility function to enhance prompt with AI-friendly terms
 export const enhancePrompt = (prompt: string, style: string): string => {
   const enhancers = [

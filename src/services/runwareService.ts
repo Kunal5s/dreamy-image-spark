@@ -1,14 +1,14 @@
 
 import { HF_API_KEY } from "@/constants/imageGeneratorConstants";
-import { getImageGenerationService, GenerateImageParams, GeneratedImage } from "./runware/imageGenerationService";
+import { getHuggingFaceService, GenerateImageParams, GeneratedImage } from "./huggingface/imageGenerationService";
 
-export type { GenerateImageParams, GeneratedImage } from "./runware/imageGenerationService";
+export type { GenerateImageParams, GeneratedImage } from "./huggingface/imageGenerationService";
 
 export class RunwareService {
-  private imageGenerationService: ReturnType<typeof getImageGenerationService>;
+  private imageGenerationService: ReturnType<typeof getHuggingFaceService>;
 
   constructor() {
-    this.imageGenerationService = getImageGenerationService(HF_API_KEY);
+    this.imageGenerationService = getHuggingFaceService(HF_API_KEY);
   }
 
   async generateImage(params: GenerateImageParams): Promise<GeneratedImage[]> {

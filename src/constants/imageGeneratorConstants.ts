@@ -1,21 +1,17 @@
-
 // API Key for Hugging Face - Updated with new key for high quality image generation
 export const HF_API_KEY = "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";
 
-// Model options with their corresponding values for Runware API
+// Model options with their corresponding values for Hugging Face API
 export const models = [
-  { value: "runware:100@1", label: "SDXL Turbo Pro", endpoint: "runware:100@1" },
-  { value: "runware:110@1", label: "Stable Diffusion XL 1.5+", endpoint: "runware:110@1" },
-  { value: "runware:120@1", label: "SD Lightning V2", endpoint: "runware:120@1" },
-  { value: "runware:130@1", label: "RealVisXL V4.0 UHD", endpoint: "runware:130@1" },
-  { value: "runware:140@1", label: "DreamShaper XL Pro", endpoint: "runware:140@1" },
-  { value: "runware:150@1", label: "DeepFloyd IF Ultra", endpoint: "runware:150@1" },
-  { value: "runware:160@1", label: "ControlNet + SDXL", endpoint: "runware:160@1" },
-  { value: "runware:200@1", label: "Playground V2.5 Ultra", endpoint: "runware:200@1" },
-  { value: "runware:210@1", label: "JuliBrain Photoreal", endpoint: "runware:210@1" },
-  { value: "runware:220@1", label: "PixArt-Σ Ultra", endpoint: "runware:220@1" },
-  { value: "runware:230@1", label: "OpenJourney V4 Pro", endpoint: "runware:230@1" },
-  { value: "runware:240@1", label: "FLUX.1-schnell MAX", endpoint: "runware:240@1" },
+  { value: "stabilityai/stable-diffusion-xl-base-1.0", label: "Stable Diffusion XL", endpoint: "stabilityai/stable-diffusion-xl-base-1.0" },
+  { value: "stabilityai/sdxl-turbo", label: "SDXL Turbo", endpoint: "stabilityai/sdxl-turbo" },
+  { value: "runwayml/stable-diffusion-v1-5", label: "Stable Diffusion 1.5", endpoint: "runwayml/stable-diffusion-v1-5" },
+  { value: "dreamlike-art/dreamlike-photoreal-2.0", label: "Dreamlike Photoreal", endpoint: "dreamlike-art/dreamlike-photoreal-2.0" },
+  { value: "CompVis/stable-diffusion-v1-4", label: "Stable Diffusion 1.4", endpoint: "CompVis/stable-diffusion-v1-4" },
+  { value: "prompthero/openjourney", label: "OpenJourney", endpoint: "prompthero/openjourney" },
+  { value: "stablediffusionapi/realistic-vision-v51", label: "Realistic Vision 5.1", endpoint: "stablediffusionapi/realistic-vision-v51" },
+  { value: "timbrooks/instruct-pix2pix", label: "Instruct Pix2Pix", endpoint: "timbrooks/instruct-pix2pix" },
+  { value: "stabilityai/stable-diffusion-2-1", label: "Stable Diffusion 2.1", endpoint: "stabilityai/stable-diffusion-2-1" },
 ];
 
 // Artistic styles options - Extended with more options
@@ -113,5 +109,5 @@ export const numberOptions = [
   { value: 12, label: "12 Images" },
 ];
 
-// Default Runware API Key - this should be replaced by user input
-export const DEFAULT_RUNWARE_API_KEY = "";
+// Default Hugging Face API Key
+export const DEFAULT_HF_API_KEY = "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";

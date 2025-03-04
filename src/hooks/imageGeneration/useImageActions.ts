@@ -34,7 +34,7 @@ export const useImageActions = ({
   numberOfImages,
   setSelectedImageIndex
 }: ImageActionsProps) => {
-  // Function to generate image using Runware API
+  // Function to generate image using HuggingFace API
   const generateImage = async () => {
     if (!prompt.trim()) {
       toast("Please enter a prompt - Your prompt will guide the AI to create your image");
@@ -61,25 +61,25 @@ export const useImageActions = ({
         numberOfImages
       });
       
-      // Using the RunwareService singleton without API key parameter
-      const runwareService = getRunwareService();
+      // Using the RunwareService singleton with our HuggingFace implementation
+      const imageService = getRunwareService();
       
       // Set a timeout to prevent long waits
       const timeoutPromise = new Promise<GeneratedImage[]>((_, reject) => {
         setTimeout(() => {
           reject(new Error("Image generation took too long. Showing sample images instead."));
-        }, 15000); // 15 seconds timeout
+        }, 20000); // 20 seconds timeout
       });
       
       // Try to generate images with a timeout
       try {
-        const generationPromise = runwareService.generateImage({
+        const generationPromise = imageService.generateImage({
           positivePrompt: completePrompt,
           model: selectedModel,
           width: dimensions.width,
           height: dimensions.height,
           numberResults: numberOfImages,
-          CFGScale: detailLevel[0] / 10, // Convert detail level to CFG scale
+          detailLevel: detailLevel[0] / 10, // Convert detail level to guidance scale
         });
         
         const generatedImages = await Promise.race([generationPromise, timeoutPromise]);
