@@ -4,14 +4,15 @@ export const HF_API_KEY = "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";
 // Model options with their corresponding values for Hugging Face API
 export const models = [
   { value: "stabilityai/stable-diffusion-xl-base-1.0", label: "Stable Diffusion XL", endpoint: "stabilityai/stable-diffusion-xl-base-1.0" },
-  { value: "stabilityai/sdxl-turbo", label: "SDXL Turbo", endpoint: "stabilityai/sdxl-turbo" },
-  { value: "runwayml/stable-diffusion-v1-5", label: "Stable Diffusion 1.5", endpoint: "runwayml/stable-diffusion-v1-5" },
-  { value: "dreamlike-art/dreamlike-photoreal-2.0", label: "Dreamlike Photoreal", endpoint: "dreamlike-art/dreamlike-photoreal-2.0" },
-  { value: "CompVis/stable-diffusion-v1-4", label: "Stable Diffusion 1.4", endpoint: "CompVis/stable-diffusion-v1-4" },
-  { value: "prompthero/openjourney", label: "OpenJourney", endpoint: "prompthero/openjourney" },
-  { value: "stablediffusionapi/realistic-vision-v51", label: "Realistic Vision 5.1", endpoint: "stablediffusionapi/realistic-vision-v51" },
-  { value: "timbrooks/instruct-pix2pix", label: "Instruct Pix2Pix", endpoint: "timbrooks/instruct-pix2pix" },
-  { value: "stabilityai/stable-diffusion-2-1", label: "Stable Diffusion 2.1", endpoint: "stabilityai/stable-diffusion-2-1" },
+  { value: "stabilityai/stable-diffusion-3-medium", label: "Stable Diffusion 3 Medium", endpoint: "stabilityai/stable-diffusion-3-medium" },
+  { value: "fluxmodels/flux.1-dev", label: "FLUX.1-dev", endpoint: "fluxmodels/flux.1-dev" },
+  { value: "fluxmodels/flux.1", label: "FLUX.1", endpoint: "fluxmodels/flux.1" },
+  { value: "fluxmodels/flux-lora-dlc", label: "FLUX LoRA DLC", endpoint: "fluxmodels/flux-lora-dlc" },
+  { value: "kandinsky-community/kandinsky-2.2", label: "Kandinsky 2.2", endpoint: "kandinsky-community/kandinsky-2.2" },
+  { value: "prompthero/openjourney-v4", label: "OpenJourney v4", endpoint: "prompthero/openjourney-v4" },
+  { value: "lykon/dreamshaper-7", label: "DreamShaper v7", endpoint: "lykon/dreamshaper-7" },
+  { value: "stablediffusionapi/anything-v5", label: "Anything V5", endpoint: "stablediffusionapi/anything-v5" },
+  { value: "stablediffusionapi/realistic-vision-v6", label: "Realistic Vision V6", endpoint: "stablediffusionapi/realistic-vision-v6" }
 ];
 
 // Artistic styles options - Extended with more options

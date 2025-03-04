@@ -4,7 +4,7 @@ import { HF_API_KEY } from "@/constants/imageGeneratorConstants";
 
 export const useImageState = () => {
   const [prompt, setPrompt] = useState("");
-  const [selectedModel, setSelectedModel] = useState("runware:100@1");
+  const [selectedModel, setSelectedModel] = useState("stabilityai/stable-diffusion-xl-base-1.0"); // Set SDXL as default
   const [selectedStyle, setSelectedStyle] = useState("hyper-realistic");
   const [aspectRatio, setAspectRatio] = useState("1:1");
   const [detailLevel, setDetailLevel] = useState([75]);

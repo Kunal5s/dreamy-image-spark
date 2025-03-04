@@ -28,7 +28,7 @@ export class HuggingFaceImageService {
   async generateImage(params: GenerateImageParams): Promise<GeneratedImage[]> {
     const { 
       positivePrompt, 
-      model = "CompVis/stable-diffusion-v1-4", // Using a faster model by default
+      model = "stabilityai/stable-diffusion-xl-base-1.0", // Using SDXL as default
       width = 512, 
       height = 512, 
       numberResults = 1,
@@ -49,7 +49,7 @@ export class HuggingFaceImageService {
       // Create multiple image requests based on numberResults
       for (let i = 0; i < numberResults; i++) {
         // Add a small delay between requests to prevent rate limiting
-        const delay = i * 150;
+        const delay = i * 100; // Reduced delay for faster generation
         generationPromises.push(
           new Promise(resolve => setTimeout(() => 
             this.generateSingleImage(model, positivePrompt, width, height, detailLevel)
@@ -87,14 +87,14 @@ export class HuggingFaceImageService {
           width,
           height,
           guidance_scale,
-          num_inference_steps: 20, // Reduced for faster generation
+          num_inference_steps: 15, // Reduced for faster generation
           scheduler: "EulerDiscreteScheduler"
         }
       };
 
       // Make the API request to Hugging Face with a timeout
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 12000); // 12 second timeout
       
       const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
         method: "POST",
@@ -118,6 +118,10 @@ export class HuggingFaceImageService {
       // Get the image blob from the response
       const imageBlob = await response.blob();
       const imageURL = URL.createObjectURL(imageBlob);
+
+      // Preload the image to make it appear faster in the UI
+      const preloadImage = new Image();
+      preloadImage.src = imageURL;
 
       return {
         imageURL,
@@ -155,8 +159,8 @@ export class HuggingFaceImageService {
   ): GeneratedImage {
     // Use specific image collections that match common AI art styles
     const collections = [
-      'wallpapers', 'nature', 'architecture', 'experimental', 
-      'textures-patterns', '3d-renders', 'digital-art'
+      'digital-art', 'wallpapers', '3d-renders', 'textures-patterns', 
+      'experimental', 'architecture', 'fantasy', 'surreal'
     ];
     
     const randomCollection = collections[Math.floor(Math.random() * collections.length)];

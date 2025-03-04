@@ -2,7 +2,7 @@
 import { toast } from "sonner";
 import { styles } from "@/constants/imageGeneratorConstants";
 import { getDimensions, enhancePrompt, getModelEndpoint } from "./utils";
-import { getRunwareService, GeneratedImage } from "@/services/runwareService";
+import { getHuggingFaceService, GeneratedImage } from "@/services/huggingface/imageGenerationService";
 
 interface ImageActionsProps {
   prompt: string;
@@ -61,14 +61,14 @@ export const useImageActions = ({
         numberOfImages
       });
       
-      // Using the RunwareService singleton with our HuggingFace implementation
-      const imageService = getRunwareService();
+      // Using the HuggingFace service directly
+      const imageService = getHuggingFaceService();
       
       // Set a shorter timeout to prevent long waits
       const timeoutPromise = new Promise<GeneratedImage[]>((_, reject) => {
         setTimeout(() => {
           reject(new Error("Image generation timeout - switching to fast mode"));
-        }, 12000); // 12 seconds timeout
+        }, 10000); // 10 seconds timeout for faster response
       });
       
       // Show initial loading feedback
@@ -85,7 +85,7 @@ export const useImageActions = ({
           detailLevel: detailLevel[0] / 100 * 15, // Convert to guidance scale between 1-15
         });
         
-        // Show message while waiting for generation
+        // Show intermediate message while waiting for generation
         setTimeout(() => {
           if (document.querySelector('[data-id="sonner-toast"][data-mounted="true"]')) {
             toast.loading("AI is creating your masterpiece...");
@@ -96,8 +96,13 @@ export const useImageActions = ({
         
         console.log("Generated images:", generatedImages);
         
-        // Extract image URLs from the response
-        const imageUrls = generatedImages.map((img: GeneratedImage) => img.imageURL);
+        // Extract image URLs from the response and preload them
+        const imageUrls = generatedImages.map((img: GeneratedImage) => {
+          // Preload the image
+          const preloadImg = new Image();
+          preloadImg.src = img.imageURL;
+          return img.imageURL;
+        });
         
         setGeneratedImages(imageUrls);
         setIsGenerating(false);
@@ -108,7 +113,8 @@ export const useImageActions = ({
         
         // Fallback to faster model with smaller image size for quicker results
         try {
-          const fasterModelEndpoint = "CompVis/stable-diffusion-v1-4"; // Faster model
+          // Use Stable Diffusion XL as a reliable fallback
+          const fasterModelEndpoint = "stabilityai/stable-diffusion-xl-base-1.0";
           const smallerDimensions = {
             width: Math.min(dimensions.width, 512),
             height: Math.min(dimensions.height, 512)
@@ -154,7 +160,7 @@ export const useImageActions = ({
     // Use Unsplash with better categories for more relevant images
     const categories = [
       'digital-art', 'wallpapers', '3d-renders', 'textures-patterns', 
-      'experimental', 'architecture', 'nature', 'animals'
+      'experimental', 'architecture', 'nature', 'fantasy'
     ];
     
     const dimensions = getDimensions(aspectRatio);

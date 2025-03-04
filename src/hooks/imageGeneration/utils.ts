@@ -1,10 +1,9 @@
-
 import { models, aspectRatios } from "@/constants/imageGeneratorConstants";
 
 // Get the model endpoint based on selected model
 export const getModelEndpoint = (selectedModel: string) => {
   const model = models.find(m => m.value === selectedModel);
-  return model ? model.endpoint : "CompVis/stable-diffusion-v1-4"; // Default to a faster model
+  return model ? model.endpoint : "stabilityai/stable-diffusion-xl-base-1.0"; // Default to SDXL
 };
 
 // Get dimensions based on selected aspect ratio
