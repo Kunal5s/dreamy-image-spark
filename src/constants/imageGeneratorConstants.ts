@@ -1,5 +1,6 @@
+
 // API Key for Hugging Face - Updated with new key for high quality image generation
-export const HF_API_KEY = "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";
+export const HF_API_KEY = "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";
 
 // Model options with their corresponding values for Runware API
 export const models = [
