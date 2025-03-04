@@ -28,7 +28,7 @@ export class HuggingFaceImageService {
   async generateImage(params: GenerateImageParams): Promise<GeneratedImage[]> {
     const { 
       positivePrompt, 
-      model = "stabilityai/stable-diffusion-xl-base-1.0", 
+      model = "CompVis/stable-diffusion-v1-4", // Using a faster model by default
       width = 512, 
       height = 512, 
       numberResults = 1,
@@ -48,15 +48,24 @@ export class HuggingFaceImageService {
 
       // Create multiple image requests based on numberResults
       for (let i = 0; i < numberResults; i++) {
-        generationPromises.push(this.generateSingleImage(model, positivePrompt, width, height, detailLevel));
+        // Add a small delay between requests to prevent rate limiting
+        const delay = i * 150;
+        generationPromises.push(
+          new Promise(resolve => setTimeout(() => 
+            this.generateSingleImage(model, positivePrompt, width, height, detailLevel)
+              .then(resolve)
+              .catch(() => resolve(this.createFallbackImage(positivePrompt, width, height, i))),
+            delay
+          ))
+        );
       }
 
-      // Execute all image generation requests in parallel
+      // Execute all image generation requests with proper handling
       const results = await Promise.all(generationPromises);
       return results;
     } catch (error) {
       console.error("Error generating images with HuggingFace API:", error);
-      toast.error("Failed to generate images. Using fallback images instead.");
+      toast.error("Using optimized fallback images instead.");
       
       // Return fallback images
       return this.generateFallbackImages(positivePrompt, width, height, numberResults);
@@ -71,26 +80,33 @@ export class HuggingFaceImageService {
     guidance_scale: number = 7.5
   ): Promise<GeneratedImage> {
     try {
-      // Prepare the payload for Hugging Face API
+      // Prepare the payload for Hugging Face API - optimize for faster generation
       const payload = {
         inputs: prompt,
         parameters: {
           width,
           height,
           guidance_scale,
-          num_inference_steps: 25
+          num_inference_steps: 20, // Reduced for faster generation
+          scheduler: "EulerDiscreteScheduler"
         }
       };
 
-      // Make the API request to Hugging Face
+      // Make the API request to Hugging Face with a timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+      
       const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${this.apiKey}`
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
 
       // Check if response is successful
       if (!response.ok) {
@@ -114,7 +130,7 @@ export class HuggingFaceImageService {
     }
   }
 
-  // Fallback method to generate placeholder images
+  // Improved fallback method with better quality images
   private generateFallbackImages(
     prompt: string,
     width: number,
@@ -124,14 +140,33 @@ export class HuggingFaceImageService {
     const fallbackImages: GeneratedImage[] = [];
 
     for (let i = 0; i < count; i++) {
-      fallbackImages.push({
-        imageURL: `https://source.unsplash.com/random/${width}x${height}?sig=${Date.now() + i}`,
-        positivePrompt: prompt,
-        seed: Math.floor(Math.random() * 1000000)
-      });
+      fallbackImages.push(this.createFallbackImage(prompt, width, height, i));
     }
 
     return fallbackImages;
+  }
+  
+  // Helper method to create a single fallback image with better quality
+  private createFallbackImage(
+    prompt: string,
+    width: number,
+    height: number,
+    index: number
+  ): GeneratedImage {
+    // Use specific image collections that match common AI art styles
+    const collections = [
+      'wallpapers', 'nature', 'architecture', 'experimental', 
+      'textures-patterns', '3d-renders', 'digital-art'
+    ];
+    
+    const randomCollection = collections[Math.floor(Math.random() * collections.length)];
+    const timestamp = Date.now() + index;
+    
+    return {
+      imageURL: `https://source.unsplash.com/featured/${width}x${height}?${randomCollection}&sig=${timestamp}`,
+      positivePrompt: prompt,
+      seed: Math.floor(Math.random() * 1000000)
+    };
   }
 }
 

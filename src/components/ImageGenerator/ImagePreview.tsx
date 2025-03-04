@@ -2,6 +2,7 @@
 import { cn } from "@/lib/utils";
 import { Download, ImageIcon, Loader2, RefreshCw, Save, Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useEffect, useRef } from "react";
 
 interface ImagePreviewProps {
   generatedImages: string[];
@@ -31,6 +32,20 @@ const ImagePreview = ({
   generateImage
 }: ImagePreviewProps) => {
   const hasMultipleImages = generatedImages.length > 1;
+  const preloadedImagesRef = useRef<Record<string, boolean>>({});
+  
+  // Preload images to make switching faster
+  useEffect(() => {
+    if (generatedImages.length > 0) {
+      generatedImages.forEach((src, index) => {
+        if (index !== selectedImageIndex && !preloadedImagesRef.current[src]) {
+          const img = new Image();
+          img.src = src;
+          preloadedImagesRef.current[src] = true;
+        }
+      });
+    }
+  }, [generatedImages, selectedImageIndex]);
   
   const navigatePrevious = () => {
     if (selectedImageIndex > 0) {
@@ -112,16 +127,28 @@ const ImagePreview = ({
               </Button>
             )}
             
-            {/* Current Image */}
-            <img
-              src={generatedImages[selectedImageIndex]}
-              alt={`Generated AI art ${selectedImageIndex + 1}`}
-              className={cn(
-                "w-full h-full object-cover transition-all duration-500",
-                !imagesLoaded[selectedImageIndex] ? "opacity-0" : "opacity-100"
-              )}
-              onLoad={() => handleImageLoad(selectedImageIndex)}
-            />
+            {/* Current Image with optimized loading */}
+            <div className="w-full h-full relative">
+              {generatedImages.map((imgSrc, index) => (
+                <img
+                  key={imgSrc}
+                  src={imgSrc}
+                  alt={`Generated AI art ${index + 1}`}
+                  className={cn(
+                    "w-full h-full object-cover transition-all duration-300 absolute top-0 left-0",
+                    index === selectedImageIndex 
+                      ? (!imagesLoaded[index] ? "opacity-0" : "opacity-100") 
+                      : "opacity-0 pointer-events-none"
+                  )}
+                  style={{ 
+                    display: index === selectedImageIndex ? 'block' : 'none'
+                  }}
+                  onLoad={() => handleImageLoad(index)}
+                  loading="eager"
+                  decoding="async"
+                />
+              ))}
+            </div>
             
             {!imagesLoaded[selectedImageIndex] && (
               <div className="absolute inset-0 flex items-center justify-center">

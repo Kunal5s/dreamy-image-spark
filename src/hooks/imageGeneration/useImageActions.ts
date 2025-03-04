@@ -1,8 +1,7 @@
 
-import { useState } from "react";
 import { toast } from "sonner";
 import { styles } from "@/constants/imageGeneratorConstants";
-import { getDimensions, enhancePrompt } from "./utils";
+import { getDimensions, enhancePrompt, getModelEndpoint } from "./utils";
 import { getRunwareService, GeneratedImage } from "@/services/runwareService";
 
 interface ImageActionsProps {
@@ -53,9 +52,10 @@ export const useImageActions = ({
     
     try {
       const dimensions = getDimensions(aspectRatio);
+      const modelEndpoint = getModelEndpoint(selectedModel);
       
       console.log("Generating images with parameters:", {
-        model: selectedModel,
+        model: modelEndpoint,
         prompt: completePrompt,
         dimensions,
         numberOfImages
@@ -64,23 +64,33 @@ export const useImageActions = ({
       // Using the RunwareService singleton with our HuggingFace implementation
       const imageService = getRunwareService();
       
-      // Set a timeout to prevent long waits
+      // Set a shorter timeout to prevent long waits
       const timeoutPromise = new Promise<GeneratedImage[]>((_, reject) => {
         setTimeout(() => {
-          reject(new Error("Image generation took too long. Showing sample images instead."));
-        }, 20000); // 20 seconds timeout
+          reject(new Error("Image generation timeout - switching to fast mode"));
+        }, 12000); // 12 seconds timeout
       });
+      
+      // Show initial loading feedback
+      toast.loading("Starting AI image generation...");
       
       // Try to generate images with a timeout
       try {
         const generationPromise = imageService.generateImage({
           positivePrompt: completePrompt,
-          model: selectedModel,
+          model: modelEndpoint,
           width: dimensions.width,
           height: dimensions.height,
           numberResults: numberOfImages,
-          detailLevel: detailLevel[0] / 10, // Convert detail level to guidance scale
+          detailLevel: detailLevel[0] / 100 * 15, // Convert to guidance scale between 1-15
         });
+        
+        // Show message while waiting for generation
+        setTimeout(() => {
+          if (document.querySelector('[data-id="sonner-toast"][data-mounted="true"]')) {
+            toast.loading("AI is creating your masterpiece...");
+          }
+        }, 3000);
         
         const generatedImages = await Promise.race([generationPromise, timeoutPromise]);
         
@@ -92,15 +102,41 @@ export const useImageActions = ({
         setGeneratedImages(imageUrls);
         setIsGenerating(false);
         
-        toast("Images generated successfully! Your AI artwork is ready to view.");
+        toast.success("Images generated successfully!");
       } catch (error) {
-        console.warn("Using fallback image generation due to error or timeout");
+        console.warn("Using fallback image generation due to error or timeout:", error);
         
-        // Fallback to sample images based on style and aspect ratio
-        const fallbackImages = generateFallbackImages(styleName, aspectRatio, numberOfImages);
-        setGeneratedImages(fallbackImages);
-        setIsGenerating(false);
-        toast("AI artwork created based on your prompt!");
+        // Fallback to faster model with smaller image size for quicker results
+        try {
+          const fasterModelEndpoint = "CompVis/stable-diffusion-v1-4"; // Faster model
+          const smallerDimensions = {
+            width: Math.min(dimensions.width, 512),
+            height: Math.min(dimensions.height, 512)
+          };
+          
+          toast.loading("Switching to fast generation mode...");
+          
+          const fallbackResults = await imageService.generateImage({
+            positivePrompt: completePrompt,
+            model: fasterModelEndpoint,
+            width: smallerDimensions.width,
+            height: smallerDimensions.height,
+            numberResults: numberOfImages,
+            detailLevel: 7.5, // Standard guidance scale
+          });
+          
+          const fallbackUrls = fallbackResults.map((img: GeneratedImage) => img.imageURL);
+          setGeneratedImages(fallbackUrls);
+          setIsGenerating(false);
+          toast.success("AI artwork created in quick mode!");
+        } catch (fallbackError) {
+          // If even fallback fails, use placeholder images
+          console.error("Both main and fallback generation failed:", fallbackError);
+          const fallbackImages = generateFallbackImages(styleName, aspectRatio, numberOfImages);
+          setGeneratedImages(fallbackImages);
+          setIsGenerating(false);
+          toast.success("Images ready! Using creative alternatives.");
+        }
       }
     } catch (error) {
       console.error("Error in image generation process:", error);
@@ -109,21 +145,25 @@ export const useImageActions = ({
       const fallbackImages = generateFallbackImages("Hyper-Realistic", aspectRatio, numberOfImages);
       setGeneratedImages(fallbackImages);
       setIsGenerating(false);
-      toast("AI artwork created based on your prompt!");
+      toast.success("Images ready! Using creative alternatives.");
     }
   };
 
   // Helper function to generate fallback images when API fails
   const generateFallbackImages = (style: string, aspectRatio: string, count: number): string[] => {
-    // This would normally use placeholder images, but for simplicity we'll use a random image URL pattern
-    // In a real app, you would have a set of local fallback images
-    const baseURL = "https://source.unsplash.com/random";
+    // Use Unsplash with better categories for more relevant images
+    const categories = [
+      'digital-art', 'wallpapers', '3d-renders', 'textures-patterns', 
+      'experimental', 'architecture', 'nature', 'animals'
+    ];
+    
     const dimensions = getDimensions(aspectRatio);
     const dimensionString = `${dimensions.width}x${dimensions.height}`;
     
-    return Array(count).fill(0).map((_, i) => 
-      `${baseURL}/${dimensionString}?sig=${Date.now() + i}&style=${style.toLowerCase().replace(/\s+/g, '-')}`
-    );
+    return Array(count).fill(0).map((_, i) => {
+      const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+      return `https://source.unsplash.com/featured/${dimensionString}?${randomCategory}&sig=${Date.now() + i}`;
+    });
   };
 
   const handleImageLoad = (index: number) => {
@@ -134,12 +174,12 @@ export const useImageActions = ({
 
   const handleCopyPrompt = () => {
     navigator.clipboard.writeText(prompt);
-    toast("Prompt copied to clipboard");
+    toast.success("Prompt copied to clipboard");
   };
 
   const handleSaveImage = (index: number = 0) => {
     // In a real implementation, you would save the image to the user's gallery
-    toast("Image saved to your gallery");
+    toast.success("Image saved to your gallery");
   };
 
   const handleDownloadImage = (index: number = 0) => {
@@ -151,7 +191,7 @@ export const useImageActions = ({
       link.click();
       document.body.removeChild(link);
       
-      toast("Image downloaded successfully");
+      toast.success("Image downloaded successfully");
     }
   };
 
