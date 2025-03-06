@@ -17,24 +17,25 @@ export class HuggingFaceImageService {
   async generateImage(params: GenerateImageParams): Promise<GeneratedImage[]> {
     const { 
       positivePrompt, 
-      model = "stabilityai/sdxl-turbo", // Using SDXL Turbo as default
-      width = 1024, 
-      height = 1024, 
+      model = "stabilityai/sdxl-turbo", // Using SDXL Turbo for faster generation
+      width = 768, // Reduced size for faster generation
+      height = 768, // Reduced size for faster generation
       numberResults = 1,
-      guidanceScale = 9,
-      steps = 45,
+      guidanceScale = 7.5, // Reduced for speed
+      steps = 30, // Reduced for speed
       seed = Math.floor(Math.random() * 2147483647)
     } = params;
 
-    console.log("Generating images with HuggingFace API:", {
+    console.log("Starting image generation with optimized parameters:", {
       model,
-      prompt: positivePrompt,
+      prompt: positivePrompt.substring(0, 50) + "...",
       dimensions: { width, height },
       numberResults,
       guidanceScale,
-      steps,
-      seed
+      steps
     });
+
+    toast.loading("Generating image...", { id: "generation-toast" });
 
     try {
       // Create array to hold all image generation promises
@@ -42,29 +43,35 @@ export class HuggingFaceImageService {
 
       // Create multiple image requests based on numberResults
       for (let i = 0; i < numberResults; i++) {
-        // Add unique seed for each image to ensure they're different
+        // Add unique seed for each image
         const uniqueSeed = seed + i;
         
-        // Add a small delay between requests to prevent rate limiting
-        const delay = i * 50; // Reduced delay for faster generation
+        // Reduced delay between requests
+        const delay = i * 20;
         generationPromises.push(
           new Promise(resolve => setTimeout(() => 
             this.apiHandler.generateSingleImage(model, positivePrompt, width, height, guidanceScale, steps, uniqueSeed)
               .then(resolve)
-              .catch(() => resolve(fallbackImageService.createFallbackImage(positivePrompt, width, height, i))),
+              .catch((error) => {
+                console.warn(`Error generating image ${i+1}:`, error);
+                resolve(fallbackImageService.createFallbackImage(positivePrompt, width, height, i));
+              }),
             delay
           ))
         );
       }
 
-      // Execute all image generation requests with proper handling
+      // Execute all image generation requests
       const results = await Promise.all(generationPromises);
+      toast.dismiss("generation-toast");
+      toast.success("Images created successfully!");
       return results;
     } catch (error) {
-      console.error("Error generating images with HuggingFace API:", error);
-      toast.error("Using optimized fallback images instead.");
+      console.error("Error generating images:", error);
+      toast.dismiss("generation-toast");
+      toast.error("Using optimized fallback images");
       
-      // Return fallback images using the dedicated service
+      // Return fallback images on error
       return fallbackImageService.generateFallbackImages(positivePrompt, width, height, numberResults);
     }
   }
