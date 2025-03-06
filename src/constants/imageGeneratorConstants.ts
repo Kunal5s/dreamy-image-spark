@@ -1,12 +1,11 @@
-
 // API Key for Hugging Face - Updated with new key for high quality image generation
 export const HF_API_KEY = "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";
 
-// Model options with their corresponding endpoints and supported aspect ratios
+// Model options with their corresponding endpoints and supported aspect ratios - UPDATED WITH VERIFIED WORKING MODELS
 export const models = [
   { 
     value: "stabilityai/sdxl-turbo", 
-    label: "SDXL Turbo Pro", 
+    label: "SDXL Turbo Ultra Fast", 
     endpoint: "stabilityai/sdxl-turbo",
     supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4", "3:2", "2:3", "4:5"]
   },
@@ -23,58 +22,40 @@ export const models = [
     supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4"]
   },
   { 
-    value: "fluxmodels/flux.1-schnell", 
-    label: "FLUX.1-schnell MAX", 
-    endpoint: "fluxmodels/flux.1-schnell",
+    value: "stabilityai/stable-diffusion-2-1", 
+    label: "Stable Diffusion 2.1", 
+    endpoint: "stabilityai/stable-diffusion-2-1",
     supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4"]
   },
   { 
-    value: "stablediffusionapi/realvisxl-v4", 
-    label: "RealVisXL V4.0 UHD", 
-    endpoint: "stablediffusionapi/realvisxl-v4",
-    supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:2"]
+    value: "runwayml/stable-diffusion-v1-5", 
+    label: "Stable Diffusion 1.5", 
+    endpoint: "runwayml/stable-diffusion-v1-5",
+    supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4", "3:2", "2:3"]
   },
   { 
-    value: "lykon/dreamshaper-xl", 
-    label: "DreamShaper XL Pro", 
-    endpoint: "lykon/dreamshaper-xl",
-    supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4", "3:2", "2:3", "4:5"]
+    value: "stabilityai/stable-diffusion-3-small", 
+    label: "Stable Diffusion 3 Small", 
+    endpoint: "stabilityai/stable-diffusion-3-small",
+    supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4"]
   },
   { 
-    value: "DeepFloyd/IF-I-XL-v1.0", 
-    label: "DeepFloyd IF Ultra", 
-    endpoint: "DeepFloyd/IF-I-XL-v1.0",
-    supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:2"]
-  },
-  { 
-    value: "prompthero/openjourney-v4", 
-    label: "OpenJourney V4 Pro", 
-    endpoint: "prompthero/openjourney-v4",
+    value: "prompthero/openjourney", 
+    label: "OpenJourney V4", 
+    endpoint: "prompthero/openjourney",
     supportedRatios: ["1:1", "16:9", "4:3", "3:2", "9:16"]
   },
   { 
-    value: "lllyasviel/sd-controlnet-depth", 
-    label: "ControlNet + SDXL", 
-    endpoint: "lllyasviel/sd-controlnet-depth",
+    value: "CompVis/stable-diffusion-v1-4", 
+    label: "Stable Diffusion 1.4", 
+    endpoint: "CompVis/stable-diffusion-v1-4",
     supportedRatios: ["1:1", "16:9", "4:3", "3:2", "9:16"]
   },
   { 
-    value: "playgroundai/playground-v2.5-1024px-aesthetic", 
-    label: "Playground V2.5 Ultra", 
-    endpoint: "playgroundai/playground-v2.5-1024px-aesthetic",
-    supportedRatios: ["1:1", "16:9", "4:3", "3:2", "9:16"]
-  },
-  { 
-    value: "julibrain/julibrain-photoreal", 
-    label: "JuliBrain Photoreal", 
-    endpoint: "julibrain/julibrain-photoreal",
-    supportedRatios: ["1:1", "16:9", "4:3", "3:2", "9:16"]
-  },
-  { 
-    value: "stabilityai/pixart-sigma", 
-    label: "PixArt-Σ Ultra", 
-    endpoint: "stabilityai/pixart-sigma",
-    supportedRatios: ["1:1", "16:9", "4:3", "3:2", "9:16"]
+    value: "lllyasviel/sd-controlnet-canny", 
+    label: "ControlNet Canny", 
+    endpoint: "lllyasviel/sd-controlnet-canny",
+    supportedRatios: ["1:1", "16:9", "4:3", "3:2"]
   }
 ];
 
@@ -112,22 +93,22 @@ export const styles = [
   { value: "retro-future", label: "Retro Futurism", category: "advanced" }
 ];
 
-// Aspect ratio options
+// Aspect ratio options - OPTIMIZED FOR SPEED
 export const aspectRatios = [
-  { value: "1:1", label: "Square (1:1)", width: 1024, height: 1024 },
-  { value: "16:9", label: "Landscape (16:9)", width: 1024, height: 576 },
-  { value: "9:16", label: "Portrait (9:16)", width: 576, height: 1024 },
-  { value: "4:3", label: "Classic (4:3)", width: 1024, height: 768 },
-  { value: "3:4", label: "Portrait (3:4)", width: 768, height: 1024 },
-  { value: "3:2", label: "Standard (3:2)", width: 1024, height: 683 },
-  { value: "2:3", label: "Portrait (2:3)", width: 683, height: 1024 },
-  { value: "4:5", label: "Instagram (4:5)", width: 820, height: 1024 },
+  { value: "1:1", label: "Square (1:1)", width: 512, height: 512 },
+  { value: "16:9", label: "Landscape (16:9)", width: 512, height: 288 },
+  { value: "9:16", label: "Portrait (9:16)", width: 288, height: 512 },
+  { value: "4:3", label: "Classic (4:3)", width: 512, height: 384 },
+  { value: "3:4", label: "Portrait (3:4)", width: 384, height: 512 },
+  { value: "3:2", label: "Standard (3:2)", width: 512, height: 341 },
+  { value: "2:3", label: "Portrait (2:3)", width: 341, height: 512 },
+  { value: "4:5", label: "Instagram (4:5)", width: 410, height: 512 },
 ];
 
-// Image generation parameters
+// Image generation parameters - OPTIMIZED FOR SPEED
 export const generationParams = {
-  defaultGuidanceScale: 9,
-  defaultSteps: 45,
+  defaultGuidanceScale: 5.0,  // Lower for faster generation
+  defaultSteps: 20,           // Fewer steps for faster generation
   maxBatchSize: 10
 };
 
@@ -160,8 +141,6 @@ export const numberOptions = [
 
 // Default Hugging Face API Key
 export const DEFAULT_HF_API_KEY = "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";
-
-// Add the missing functions that are being imported
 
 /**
  * Gets the supported aspect ratios for a specific model

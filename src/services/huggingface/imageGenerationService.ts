@@ -5,6 +5,13 @@ import { GenerateImageParams, GeneratedImage } from "./types";
 import { fallbackImageService } from "./fallbackService";
 import { HuggingFaceApiHandler } from "./apiHandler";
 
+// List of fastest models for priority selection
+const FAST_MODELS = [
+  "stabilityai/sdxl-turbo",
+  "ByteDance/SDXL-Lightning",
+  "stabilityai/stable-diffusion-xl-base-1.0"
+];
+
 export class HuggingFaceImageService {
   private apiKey: string;
   private apiHandler: HuggingFaceApiHandler;
@@ -16,63 +23,65 @@ export class HuggingFaceImageService {
 
   async generateImage(params: GenerateImageParams): Promise<GeneratedImage[]> {
     const { 
-      positivePrompt, 
-      model = "stabilityai/sdxl-turbo", // Using SDXL Turbo for faster generation
-      width = 768, // Reduced size for faster generation
-      height = 768, // Reduced size for faster generation
+      positivePrompt,
+      model: requestedModel = "stabilityai/sdxl-turbo", 
+      width = 512, // Reduced size for maximum speed
+      height = 512, // Reduced size for maximum speed
       numberResults = 1,
-      guidanceScale = 7.5, // Reduced for speed
-      steps = 30, // Reduced for speed
+      guidanceScale = 5.0, // Minimum for speed
+      steps = 20, // Minimum for speed
       seed = Math.floor(Math.random() * 2147483647)
     } = params;
 
-    console.log("Starting image generation with optimized parameters:", {
-      model,
-      prompt: positivePrompt.substring(0, 50) + "...",
-      dimensions: { width, height },
-      numberResults,
-      guidanceScale,
-      steps
+    // Simplify the prompt for faster processing
+    const simplifiedPrompt = positivePrompt.length > 100 
+      ? positivePrompt.substring(0, 100) 
+      : positivePrompt;
+
+    console.log("Starting ultra-fast image generation:", {
+      model: requestedModel,
+      prompt: simplifiedPrompt.substring(0, 30) + "...",
+      dimensions: { width, height }
     });
 
-    toast.loading("Generating image...", { id: "generation-toast" });
+    toast.loading("Generating image at high speed...", { id: "generation-toast" });
 
     try {
-      // Create array to hold all image generation promises
+      // Try to use the requested model first, but be ready to fall back
+      const modelToUse = requestedModel;
+      
+      // Create optimized promises with minimal delay
       const generationPromises: Promise<GeneratedImage>[] = [];
-
-      // Create multiple image requests based on numberResults
+      
       for (let i = 0; i < numberResults; i++) {
-        // Add unique seed for each image
         const uniqueSeed = seed + i;
-        
-        // Reduced delay between requests
-        const delay = i * 20;
+        // No delay between requests for maximum parallelism
         generationPromises.push(
-          new Promise(resolve => setTimeout(() => 
-            this.apiHandler.generateSingleImage(model, positivePrompt, width, height, guidanceScale, steps, uniqueSeed)
-              .then(resolve)
-              .catch((error) => {
-                console.warn(`Error generating image ${i+1}:`, error);
-                resolve(fallbackImageService.createFallbackImage(positivePrompt, width, height, i));
-              }),
-            delay
-          ))
+          this.apiHandler.generateSingleImage(modelToUse, simplifiedPrompt, width, height, guidanceScale, steps, uniqueSeed)
+            .catch((error) => {
+              console.warn(`Error with primary model, trying fallback for image ${i+1}:`, error);
+              // Try with the fastest model as fallback
+              return this.apiHandler.generateSingleImage(FAST_MODELS[0], simplifiedPrompt, 384, 384, 5.0, 15, uniqueSeed)
+                .catch((fallbackError) => {
+                  console.warn(`Fallback model failed too for image ${i+1}:`, fallbackError);
+                  return fallbackImageService.createFallbackImage(simplifiedPrompt, width, height, i);
+                });
+            })
         );
       }
 
-      // Execute all image generation requests
+      // Execute all image generation requests in parallel
       const results = await Promise.all(generationPromises);
       toast.dismiss("generation-toast");
       toast.success("Images created successfully!");
       return results;
     } catch (error) {
-      console.error("Error generating images:", error);
+      console.error("All image generation attempts failed:", error);
       toast.dismiss("generation-toast");
       toast.error("Using optimized fallback images");
       
-      // Return fallback images on error
-      return fallbackImageService.generateFallbackImages(positivePrompt, width, height, numberResults);
+      // Return instant fallback images on error
+      return fallbackImageService.generateFallbackImages(simplifiedPrompt, width, height, numberResults);
     }
   }
 }

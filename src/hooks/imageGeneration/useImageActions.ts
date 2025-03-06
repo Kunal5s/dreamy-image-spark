@@ -1,3 +1,4 @@
+
 import { toast } from "sonner";
 import { styles } from "@/constants/imageGeneratorConstants";
 import { getDimensions, enhancePrompt, getModelEndpoint, calculateGuidanceScale, calculateSteps, getRandomSeed, generateUniqueHash } from "./utils";
@@ -40,7 +41,7 @@ export const useImageActions = ({
   uniqueHash,
   resetUniqueHash
 }: ImageActionsProps) => {
-  // Function to generate image using HuggingFace API - optimized for speed
+  // Ultra-optimized image generation function
   const generateImage = async () => {
     if (!prompt.trim()) {
       toast("Please enter a prompt to generate an image");
@@ -53,41 +54,42 @@ export const useImageActions = ({
     setSelectedImageIndex(0);
     resetUniqueHash();
     
-    // Build the prompt with style
+    // Simplified prompt handling
     const styleInfo = styles.find(s => s.value === selectedStyle);
-    const styleName = styleInfo ? styleInfo.label : "Modern Digital Art";
+    const styleName = styleInfo ? styleInfo.label : "";
     
-    // Simplified prompt enhancement for faster processing
-    const completePrompt = `${prompt}, ${styleName} style`;
+    // Ultra-minimal prompt for speed
+    const completePrompt = styleName ? `${prompt}, ${styleName}` : prompt;
     
     try {
       const dimensions = getDimensions(aspectRatio);
       
-      // Use smaller dimensions for faster generation
-      const optimizedWidth = Math.min(dimensions.width, 768);
-      const optimizedHeight = Math.min(dimensions.height, 768);
+      // Force smaller dimensions for maximum speed
+      const optimizedWidth = Math.min(dimensions.width, 512);
+      const optimizedHeight = Math.min(dimensions.height, 512);
       
       const modelEndpoint = getModelEndpoint(selectedModel);
       const randomSeed = getRandomSeed();
       
-      console.log("Generating with optimized settings:", {
+      console.log("High-speed generation with:", {
         model: modelEndpoint,
         dimensions: `${optimizedWidth}x${optimizedHeight}`,
         images: numberOfImages
       });
       
-      // Using the optimized HuggingFace service
+      // Get optimized image service
       const imageService = getHuggingFaceService();
       
       try {
+        // First attempt with requested model
         const generatedImages = await imageService.generateImage({
           positivePrompt: completePrompt,
           model: modelEndpoint,
           width: optimizedWidth,
           height: optimizedHeight,
           numberResults: numberOfImages,
-          guidanceScale: 7.5, // Lower for speed
-          steps: 30, // Lower for speed
+          guidanceScale: 5.0, // Lowest for maximum speed
+          steps: 20, // Minimum steps for speed
           seed: randomSeed
         });
         
@@ -95,32 +97,33 @@ export const useImageActions = ({
         const imageUrls = generatedImages.map((img: GeneratedImage) => img.imageURL);
         setGeneratedImages(imageUrls);
         setIsGenerating(false);
+        toast.success("Images generated at maximum speed!");
       } catch (error) {
-        console.warn("Using fallback for generation:", error);
+        console.warn("Using ultra-fast fallback:", error);
         
-        // Use SDXL Turbo as reliable fallback
+        // Try with SDXL Turbo for guaranteed speed
         const fasterModelEndpoint = "stabilityai/sdxl-turbo";
         
-        toast.loading("Using fast generation mode...");
+        toast.loading("Using lightning-fast mode...");
         
         try {
           const fallbackResults = await imageService.generateImage({
             positivePrompt: completePrompt,
             model: fasterModelEndpoint,
-            width: Math.min(optimizedWidth, 512), // Even smaller for fallback
-            height: Math.min(optimizedHeight, 512), // Even smaller for fallback
+            width: Math.min(optimizedWidth, 384), // Even smaller for maximum speed
+            height: Math.min(optimizedHeight, 384), // Even smaller for maximum speed
             numberResults: numberOfImages,
-            guidanceScale: 7,
-            steps: 25,
+            guidanceScale: 5.0, // Lowest possible
+            steps: 15, // Ultra-low steps
             seed: randomSeed + 1
           });
           
           const fallbackUrls = fallbackResults.map((img: GeneratedImage) => img.imageURL);
           setGeneratedImages(fallbackUrls);
           setIsGenerating(false);
-          toast.success("Images created successfully!");
+          toast.success("Fast images created successfully!");
         } catch (fallbackError) {
-          console.error("Fallback generation failed:", fallbackError);
+          console.error("All generation failed, using placeholder images:", fallbackError);
           const unsplashImages = generateFallbackImages(styleName, aspectRatio, numberOfImages);
           setGeneratedImages(unsplashImages);
           setIsGenerating(false);
@@ -128,7 +131,7 @@ export const useImageActions = ({
         }
       }
     } catch (error) {
-      console.error("Error in generation process:", error);
+      console.error("Error in entire generation process:", error);
       const fallbackImages = generateFallbackImages("Digital Art", aspectRatio, numberOfImages);
       setGeneratedImages(fallbackImages);
       setIsGenerating(false);
@@ -136,15 +139,14 @@ export const useImageActions = ({
     }
   };
 
-  // Generate fallback images from Unsplash with optimized categories
+  // Generate fallback images from Unsplash with optimized categories - now even faster
   const generateFallbackImages = (style: string, aspectRatio: string, count: number): string[] => {
     const categories = [
-      'digital-art', 'wallpapers', '3d-renders', 'art', 
-      'fantasy', 'illustration', 'landscape', 'abstract'
+      'digital-art', 'art', 'fantasy', 'abstract', 'wallpaper'
     ];
     
     const dimensions = getDimensions(aspectRatio);
-    const dimensionString = `${dimensions.width}x${dimensions.height}`;
+    const dimensionString = `${Math.min(dimensions.width, 512)}x${Math.min(dimensions.height, 512)}`;
     
     return Array(count).fill(0).map((_, i) => {
       const randomCategory = categories[Math.floor(Math.random() * categories.length)];
