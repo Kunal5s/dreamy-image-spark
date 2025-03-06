@@ -19,6 +19,10 @@ export interface ImageGenerationHook {
   setNumberOfImages: (num: number) => void;
   selectedImageIndex: number;
   setSelectedImageIndex: (index: number) => void;
+  guidanceScale: number;
+  setGuidanceScale: (scale: number) => void;
+  steps: number;
+  setSteps: (steps: number) => void;
   generateImage: () => Promise<void>;
   handleImageLoad: (index: number) => void;
   handleCopyPrompt: () => void;

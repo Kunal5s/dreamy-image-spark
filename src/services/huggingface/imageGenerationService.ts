@@ -1,6 +1,6 @@
 
 import { toast } from "sonner";
-import { HF_API_KEY } from "@/constants/imageGeneratorConstants";
+import { HF_API_KEY, generateUniqueHash } from "@/constants/imageGeneratorConstants";
 
 export interface GenerateImageParams {
   positivePrompt: string;
@@ -8,7 +8,9 @@ export interface GenerateImageParams {
   width?: number;
   height?: number;
   numberResults?: number;
-  detailLevel?: number;
+  guidanceScale?: number;
+  steps?: number;
+  seed?: number;
 }
 
 export interface GeneratedImage {
@@ -28,18 +30,23 @@ export class HuggingFaceImageService {
   async generateImage(params: GenerateImageParams): Promise<GeneratedImage[]> {
     const { 
       positivePrompt, 
-      model = "stabilityai/stable-diffusion-xl-base-1.0", // Using SDXL as default
-      width = 512, 
-      height = 512, 
+      model = "stabilityai/sdxl-turbo", // Using SDXL Turbo as default
+      width = 1024, 
+      height = 1024, 
       numberResults = 1,
-      detailLevel = 7.5 
+      guidanceScale = 9,
+      steps = 45,
+      seed = Math.floor(Math.random() * 2147483647)
     } = params;
 
     console.log("Generating images with HuggingFace API:", {
       model,
       prompt: positivePrompt,
       dimensions: { width, height },
-      numberResults
+      numberResults,
+      guidanceScale,
+      steps,
+      seed
     });
 
     try {
@@ -48,11 +55,14 @@ export class HuggingFaceImageService {
 
       // Create multiple image requests based on numberResults
       for (let i = 0; i < numberResults; i++) {
+        // Add unique seed for each image to ensure they're different
+        const uniqueSeed = seed + i;
+        
         // Add a small delay between requests to prevent rate limiting
-        const delay = i * 100; // Reduced delay for faster generation
+        const delay = i * 50; // Reduced delay for faster generation
         generationPromises.push(
           new Promise(resolve => setTimeout(() => 
-            this.generateSingleImage(model, positivePrompt, width, height, detailLevel)
+            this.generateSingleImage(model, positivePrompt, width, height, guidanceScale, steps, uniqueSeed)
               .then(resolve)
               .catch(() => resolve(this.createFallbackImage(positivePrompt, width, height, i))),
             delay
@@ -77,24 +87,28 @@ export class HuggingFaceImageService {
     prompt: string, 
     width: number, 
     height: number, 
-    guidance_scale: number = 7.5
+    guidance_scale: number = 9,
+    num_inference_steps: number = 45,
+    seed: number = Math.floor(Math.random() * 2147483647)
   ): Promise<GeneratedImage> {
     try {
-      // Prepare the payload for Hugging Face API - optimize for faster generation
+      // Prepare the payload for Hugging Face API - optimized for quality
       const payload = {
         inputs: prompt,
         parameters: {
           width,
           height,
           guidance_scale,
-          num_inference_steps: 15, // Reduced for faster generation
-          scheduler: "EulerDiscreteScheduler"
+          num_inference_steps,
+          seed,
+          negative_prompt: "low quality, blurry, distorted, deformed, disfigured, text, watermark, signature",
+          scheduler: "DPMSolverMultistep" // Better scheduler for quality
         }
       };
 
       // Make the API request to Hugging Face with a timeout
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 12000); // 12 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
       
       const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
         method: "POST",
@@ -110,7 +124,7 @@ export class HuggingFaceImageService {
 
       // Check if response is successful
       if (!response.ok) {
-        const error = await response.json();
+        const error = await response.json().catch(() => ({ error: "Unknown error" }));
         console.error("Hugging Face API error:", error);
         throw new Error(`Hugging Face API error: ${error.error || "Unknown error"}`);
       }
@@ -126,7 +140,7 @@ export class HuggingFaceImageService {
       return {
         imageURL,
         positivePrompt: prompt,
-        seed: Math.floor(Math.random() * 1000000) // Random seed for tracking
+        seed
       };
     } catch (error) {
       console.error("Error in generateSingleImage:", error);
@@ -164,12 +178,13 @@ export class HuggingFaceImageService {
     ];
     
     const randomCollection = collections[Math.floor(Math.random() * collections.length)];
-    const timestamp = Date.now() + index;
+    const uniqueTimestamp = Date.now() + index;
+    const uniqueSeed = Math.floor(Math.random() * 1000000);
     
     return {
-      imageURL: `https://source.unsplash.com/featured/${width}x${height}?${randomCollection}&sig=${timestamp}`,
+      imageURL: `https://source.unsplash.com/featured/${width}x${height}?${randomCollection}&sig=${uniqueTimestamp}`,
       positivePrompt: prompt,
-      seed: Math.floor(Math.random() * 1000000)
+      seed: uniqueSeed
     };
   }
 }

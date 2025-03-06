@@ -1,7 +1,7 @@
 
 import { toast } from "sonner";
 import { styles } from "@/constants/imageGeneratorConstants";
-import { getDimensions, enhancePrompt, getModelEndpoint } from "./utils";
+import { getDimensions, enhancePrompt, getModelEndpoint, calculateGuidanceScale, calculateSteps, getRandomSeed, generateUniqueHash } from "./utils";
 import { getHuggingFaceService, GeneratedImage } from "@/services/huggingface/imageGenerationService";
 
 interface ImageActionsProps {
@@ -17,6 +17,10 @@ interface ImageActionsProps {
   setError: (error: string) => void;
   numberOfImages: number;
   setSelectedImageIndex: (index: number) => void;
+  guidanceScale: number;
+  steps: number;
+  uniqueHash: string;
+  resetUniqueHash: () => void;
 }
 
 export const useImageActions = ({
@@ -31,7 +35,11 @@ export const useImageActions = ({
   setImagesLoaded,
   setError,
   numberOfImages,
-  setSelectedImageIndex
+  setSelectedImageIndex,
+  guidanceScale,
+  steps,
+  uniqueHash,
+  resetUniqueHash
 }: ImageActionsProps) => {
   // Function to generate image using HuggingFace API
   const generateImage = async () => {
@@ -44,31 +52,36 @@ export const useImageActions = ({
     setImagesLoaded({});
     setError("");
     setSelectedImageIndex(0);
+    resetUniqueHash(); // Reset unique hash to force new image generation
     
     // Build the complete prompt with style using the enhanced prompt method
     const styleInfo = styles.find(s => s.value === selectedStyle);
-    const styleName = styleInfo ? styleInfo.label : "Hyper-Realistic";
+    const styleName = styleInfo ? styleInfo.label : "Ultra-Photorealistic";
     const completePrompt = enhancePrompt(prompt, styleName);
     
     try {
       const dimensions = getDimensions(aspectRatio);
       const modelEndpoint = getModelEndpoint(selectedModel);
+      const randomSeed = getRandomSeed(); // Get a random seed for uniqueness
       
       console.log("Generating images with parameters:", {
         model: modelEndpoint,
         prompt: completePrompt,
         dimensions,
-        numberOfImages
+        numberOfImages,
+        guidanceScale,
+        steps,
+        seed: randomSeed
       });
       
       // Using the HuggingFace service directly
       const imageService = getHuggingFaceService();
       
-      // Set a shorter timeout to prevent long waits
+      // Set a timeout to prevent long waits
       const timeoutPromise = new Promise<GeneratedImage[]>((_, reject) => {
         setTimeout(() => {
           reject(new Error("Image generation timeout - switching to fast mode"));
-        }, 10000); // 10 seconds timeout for faster response
+        }, 20000); // 20 seconds timeout for better quality
       });
       
       // Show initial loading feedback
@@ -82,7 +95,9 @@ export const useImageActions = ({
           width: dimensions.width,
           height: dimensions.height,
           numberResults: numberOfImages,
-          detailLevel: detailLevel[0] / 100 * 15, // Convert to guidance scale between 1-15
+          guidanceScale: guidanceScale,
+          steps: steps,
+          seed: randomSeed
         });
         
         // Show intermediate message while waiting for generation
@@ -113,11 +128,11 @@ export const useImageActions = ({
         
         // Fallback to faster model with smaller image size for quicker results
         try {
-          // Use Stable Diffusion XL as a reliable fallback
-          const fasterModelEndpoint = "stabilityai/stable-diffusion-xl-base-1.0";
+          // Use SDXL Turbo as a reliable fallback
+          const fasterModelEndpoint = "stabilityai/sdxl-turbo";
           const smallerDimensions = {
-            width: Math.min(dimensions.width, 512),
-            height: Math.min(dimensions.height, 512)
+            width: Math.min(dimensions.width, 768),
+            height: Math.min(dimensions.height, 768)
           };
           
           toast.loading("Switching to fast generation mode...");
@@ -128,7 +143,9 @@ export const useImageActions = ({
             width: smallerDimensions.width,
             height: smallerDimensions.height,
             numberResults: numberOfImages,
-            detailLevel: 7.5, // Standard guidance scale
+            guidanceScale: 7.5, // Lower guidance scale for speed
+            steps: 30, // Fewer steps for speed
+            seed: randomSeed + 1 // Slightly different seed
           });
           
           const fallbackUrls = fallbackResults.map((img: GeneratedImage) => img.imageURL);
@@ -148,7 +165,7 @@ export const useImageActions = ({
       console.error("Error in image generation process:", error);
       
       // Provide fallback images even in case of errors
-      const fallbackImages = generateFallbackImages("Hyper-Realistic", aspectRatio, numberOfImages);
+      const fallbackImages = generateFallbackImages("Ultra-Photorealistic", aspectRatio, numberOfImages);
       setGeneratedImages(fallbackImages);
       setIsGenerating(false);
       toast.success("Images ready! Using creative alternatives.");
@@ -168,7 +185,8 @@ export const useImageActions = ({
     
     return Array(count).fill(0).map((_, i) => {
       const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-      return `https://source.unsplash.com/featured/${dimensionString}?${randomCategory}&sig=${Date.now() + i}`;
+      const uniqueHash = generateUniqueHash(); // Ensure images are unique
+      return `https://source.unsplash.com/featured/${dimensionString}?${randomCategory}&sig=${uniqueHash + i}`;
     });
   };
 
@@ -190,9 +208,17 @@ export const useImageActions = ({
 
   const handleDownloadImage = (index: number = 0) => {
     if (generatedImages.length > 0 && generatedImages[index]) {
+      // Create a modified filename with the prompt
+      const promptSlug = prompt
+        .substring(0, 20)
+        .trim()
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, "")
+        .replace(/[\s_-]+/g, "-");
+        
       const link = document.createElement('a');
       link.href = generatedImages[index];
-      link.download = `ai-generated-image-${Date.now()}.png`;
+      link.download = `ai-image-${promptSlug}-${Date.now()}.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

@@ -8,7 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { 
   Select, 
   SelectContent, 
+  SelectGroup,
   SelectItem, 
+  SelectLabel,
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
@@ -35,6 +37,10 @@ const PromptTab = ({
   handleStyleChange,
   handlePromptSuggestion
 }: PromptTabProps) => {
+  // Group styles by category
+  const basicStyles = styles.filter(style => style.category === "basic");
+  const advancedStyles = styles.filter(style => style.category === "advanced");
+
   return (
     <div className="space-y-4 mt-2">
       <div className="space-y-2">
@@ -83,12 +89,24 @@ const PromptTab = ({
           <SelectTrigger className="bg-background/50">
             <SelectValue placeholder="Select Style" />
           </SelectTrigger>
-          <SelectContent className="max-h-60">
-            {styles.map((style) => (
-              <SelectItem key={style.value} value={style.value}>
-                {style.label}
-              </SelectItem>
-            ))}
+          <SelectContent className="max-h-80">
+            <SelectGroup>
+              <SelectLabel>Basic Styles</SelectLabel>
+              {basicStyles.map((style) => (
+                <SelectItem key={style.value} value={style.value}>
+                  {style.label}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+            
+            <SelectGroup>
+              <SelectLabel>Advanced & Photorealistic</SelectLabel>
+              {advancedStyles.map((style) => (
+                <SelectItem key={style.value} value={style.value}>
+                  {style.label}
+                </SelectItem>
+              ))}
+            </SelectGroup>
           </SelectContent>
         </Select>
       </div>

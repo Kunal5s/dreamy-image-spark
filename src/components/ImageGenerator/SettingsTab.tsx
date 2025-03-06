@@ -3,7 +3,9 @@ import {
   Cpu,
   Maximize,
   Settings,
-  Grid
+  Grid,
+  Wand2,
+  Clock
 } from "lucide-react";
 import { 
   Select, 
@@ -13,7 +15,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { models, aspectRatios, numberOptions } from "@/constants/imageGeneratorConstants";
+import { models, aspectRatios, numberOptions, getSupportedRatios } from "@/constants/imageGeneratorConstants";
 
 interface SettingsTabProps {
   selectedModel: string;
@@ -36,6 +38,14 @@ const SettingsTab = ({
   handleDetailLevelChange,
   handleNumberOfImagesChange
 }: SettingsTabProps) => {
+  // Get supported aspect ratios for the selected model
+  const supportedRatioValues = getSupportedRatios(selectedModel);
+  
+  // Filter aspect ratios to only show supported ones
+  const filteredRatios = aspectRatios.filter(ratio => 
+    supportedRatioValues.includes(ratio.value)
+  );
+
   return (
     <div className="space-y-4 mt-2">
       <div className="space-y-3">
@@ -89,19 +99,22 @@ const SettingsTab = ({
             <SelectValue placeholder="Select Ratio" />
           </SelectTrigger>
           <SelectContent>
-            {aspectRatios.map((ratio) => (
+            {filteredRatios.map((ratio) => (
               <SelectItem key={ratio.value} value={ratio.value}>
                 {ratio.label}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
+        <p className="text-xs text-muted-foreground">
+          Available ratios depend on the selected model
+        </p>
       </div>
 
       <div className="space-y-2">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Settings className="h-4 w-4 text-muted-foreground" />
+            <Wand2 className="h-4 w-4 text-muted-foreground" />
             <label className="text-sm font-medium">Detail Level</label>
           </div>
           <span className="text-xs text-muted-foreground">{detailLevel[0]}%</span>
@@ -113,6 +126,9 @@ const SettingsTab = ({
           step={1}
           className="py-2"
         />
+        <p className="text-xs text-muted-foreground">
+          Higher values produce more detailed images
+        </p>
       </div>
     </div>
   );

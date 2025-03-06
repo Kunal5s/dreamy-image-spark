@@ -1,74 +1,115 @@
-// API Key for Hugging Face - Updated with new key for high quality image generation
-export const HF_API_KEY = "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";
 
-// Model options with their corresponding values for Hugging Face API
+// API Key for Hugging Face - Updated with new key for high quality image generation
+export const HF_API_KEY = "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";
+
+// Model options with their corresponding endpoints and supported aspect ratios
 export const models = [
-  { value: "stabilityai/stable-diffusion-xl-base-1.0", label: "Stable Diffusion XL", endpoint: "stabilityai/stable-diffusion-xl-base-1.0" },
-  { value: "stabilityai/stable-diffusion-3-medium", label: "Stable Diffusion 3 Medium", endpoint: "stabilityai/stable-diffusion-3-medium" },
-  { value: "fluxmodels/flux.1-dev", label: "FLUX.1-dev", endpoint: "fluxmodels/flux.1-dev" },
-  { value: "fluxmodels/flux.1", label: "FLUX.1", endpoint: "fluxmodels/flux.1" },
-  { value: "fluxmodels/flux-lora-dlc", label: "FLUX LoRA DLC", endpoint: "fluxmodels/flux-lora-dlc" },
-  { value: "kandinsky-community/kandinsky-2.2", label: "Kandinsky 2.2", endpoint: "kandinsky-community/kandinsky-2.2" },
-  { value: "prompthero/openjourney-v4", label: "OpenJourney v4", endpoint: "prompthero/openjourney-v4" },
-  { value: "lykon/dreamshaper-7", label: "DreamShaper v7", endpoint: "lykon/dreamshaper-7" },
-  { value: "stablediffusionapi/anything-v5", label: "Anything V5", endpoint: "stablediffusionapi/anything-v5" },
-  { value: "stablediffusionapi/realistic-vision-v6", label: "Realistic Vision V6", endpoint: "stablediffusionapi/realistic-vision-v6" }
+  { 
+    value: "stabilityai/sdxl-turbo", 
+    label: "SDXL Turbo Pro", 
+    endpoint: "stabilityai/sdxl-turbo",
+    supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4", "3:2", "2:3", "4:5"]
+  },
+  { 
+    value: "stabilityai/stable-diffusion-xl-base-1.0", 
+    label: "Stable Diffusion XL 1.5+", 
+    endpoint: "stabilityai/stable-diffusion-xl-base-1.0",
+    supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4", "3:2", "2:3", "4:5"]
+  },
+  { 
+    value: "ByteDance/SDXL-Lightning", 
+    label: "SD Lightning V2", 
+    endpoint: "ByteDance/SDXL-Lightning",
+    supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4"]
+  },
+  { 
+    value: "fluxmodels/flux.1-schnell", 
+    label: "FLUX.1-schnell MAX", 
+    endpoint: "fluxmodels/flux.1-schnell",
+    supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4"]
+  },
+  { 
+    value: "stablediffusionapi/realvisxl-v4", 
+    label: "RealVisXL V4.0 UHD", 
+    endpoint: "stablediffusionapi/realvisxl-v4",
+    supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:2"]
+  },
+  { 
+    value: "lykon/dreamshaper-xl", 
+    label: "DreamShaper XL Pro", 
+    endpoint: "lykon/dreamshaper-xl",
+    supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4", "3:2", "2:3", "4:5"]
+  },
+  { 
+    value: "DeepFloyd/IF-I-XL-v1.0", 
+    label: "DeepFloyd IF Ultra", 
+    endpoint: "DeepFloyd/IF-I-XL-v1.0",
+    supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:2"]
+  },
+  { 
+    value: "prompthero/openjourney-v4", 
+    label: "OpenJourney V4 Pro", 
+    endpoint: "prompthero/openjourney-v4",
+    supportedRatios: ["1:1", "16:9", "4:3", "3:2", "9:16"]
+  },
+  { 
+    value: "lllyasviel/sd-controlnet-depth", 
+    label: "ControlNet + SDXL", 
+    endpoint: "lllyasviel/sd-controlnet-depth",
+    supportedRatios: ["1:1", "16:9", "4:3", "3:2", "9:16"]
+  },
+  { 
+    value: "playgroundai/playground-v2.5-1024px-aesthetic", 
+    label: "Playground V2.5 Ultra", 
+    endpoint: "playgroundai/playground-v2.5-1024px-aesthetic",
+    supportedRatios: ["1:1", "16:9", "4:3", "3:2", "9:16"]
+  },
+  { 
+    value: "julibrain/julibrain-photoreal", 
+    label: "JuliBrain Photoreal", 
+    endpoint: "julibrain/julibrain-photoreal",
+    supportedRatios: ["1:1", "16:9", "4:3", "3:2", "9:16"]
+  },
+  { 
+    value: "stabilityai/pixart-sigma", 
+    label: "PixArt-Σ Ultra", 
+    endpoint: "stabilityai/pixart-sigma",
+    supportedRatios: ["1:1", "16:9", "4:3", "3:2", "9:16"]
+  }
 ];
 
-// Artistic styles options - Extended with more options
+// Artistic styles options - Updated categories
 export const styles = [
-  { value: "hyper-realistic", label: "Hyper-Realistic" },
-  { value: "abstract", label: "Abstract Art" },
-  { value: "modern-digital", label: "Modern Digital Art" },
-  { value: "painterly", label: "Painterly" },
-  { value: "anime", label: "Advanced Anime" },
-  { value: "scifi", label: "Sci-Fi Concept" },
-  { value: "fantasy", label: "Fantasy Epic" },
-  { value: "cyberpunk", label: "Cyberpunk" },
-  { value: "hyper3d", label: "Hyper-Realistic 3D" },
-  { value: "anime-cyberpunk", label: "Anime Cyberpunk" },
-  { value: "pixel", label: "Pixel Art" },
-  { value: "watercolor", label: "Watercolor" },
-  { value: "concept", label: "Concept Art" },
-  { value: "ink", label: "Detailed Ink Sketch" },
-  { value: "surrealism", label: "AI Surrealism" },
-  { value: "dark-fantasy", label: "Dark Fantasy" },
-  { value: "minimalist", label: "Minimalist Line Art" },
-  { value: "retro-future", label: "Retro Futurism" },
-  { value: "renaissance", label: "Renaissance Oil" },
-  { value: "comic", label: "Comic Book" },
-  { value: "isometric", label: "3D Isometric" },
-  { value: "lowpoly", label: "Low Poly 3D" },
-  { value: "pop-art", label: "Pop Art" },
-  { value: "steampunk", label: "Steampunk" },
-  { value: "cinematic", label: "Cinematic" },
-  { value: "vaporwave", label: "Vaporwave" },
-  { value: "portrait", label: "Portrait Photography" },
-  { value: "architectural", label: "Architectural Visualization" },
-  { value: "nature", label: "Nature Photography" },
-  { value: "baroque", label: "Baroque" },
-  { value: "neon", label: "Neon Futuristic" },
-  { value: "vintage", label: "Vintage Photography" },
-  { value: "polaroid", label: "Polaroid Style" },
-  { value: "oil-painting", label: "Oil Painting" },
-  { value: "studio-ghibli", label: "Studio Ghibli" },
-  { value: "vector", label: "Vector Art" },
-  { value: "gothic", label: "Gothic Art" },
-  { value: "pencil-sketch", label: "Pencil Sketch" },
-  { value: "stained-glass", label: "Stained Glass" },
-  { value: "impressionist", label: "Impressionist" },
-  { value: "mosaic", label: "Digital Mosaic" },
-  { value: "ukiyo-e", label: "Ukiyo-e Japanese" },
-  { value: "graffiti", label: "Urban Graffiti" },
-  { value: "noir", label: "Film Noir" },
-  { value: "holographic", label: "Holographic" },
-  { value: "synthwave", label: "Synthwave" },
-  { value: "dieselpunk", label: "Dieselpunk" },
-  { value: "brutalist", label: "Brutalist" },
-  { value: "fractal", label: "Fractal Art" },
-  { value: "bauhaus", label: "Bauhaus" },
-  { value: "glitch", label: "Digital Glitch" },
-  { value: "deco", label: "Art Deco" },
+  // Modern Digital Art Category
+  { value: "modern-digital", label: "Modern Digital Art", category: "basic" },
+  { value: "painterly", label: "Painterly", category: "basic" },
+  { value: "abstract", label: "Abstract Art", category: "basic" },
+  { value: "watercolor", label: "Watercolor", category: "basic" },
+  { value: "minimalist", label: "Minimalist Line Art", category: "basic" },
+  { value: "lowpoly", label: "3D Low Poly", category: "basic" },
+  { value: "comic", label: "Comic Book", category: "basic" },
+  { value: "vector", label: "Vector Art", category: "basic" },
+  
+  // Ultra-Photorealistic & Advanced Styles
+  { value: "hyper3d", label: "Hyper-Realistic 3D", category: "advanced" },
+  { value: "ultra-photorealistic", label: "Ultra-Photorealistic", category: "advanced" },
+  { value: "cinematic-8k", label: "Cinematic 8K", category: "advanced" },
+  { value: "concept", label: "Professional Concept Art", category: "advanced" },
+  { value: "anime", label: "Advanced Anime", category: "advanced" },
+  { value: "anime-cyberpunk", label: "Anime Cyberpunk", category: "advanced" },
+  { value: "professional-manga", label: "Professional Manga", category: "advanced" },
+  { value: "scifi", label: "Sci-Fi Concept", category: "advanced" },
+  { value: "fantasy", label: "Fantasy Epic", category: "advanced" },
+  { value: "cyberpunk", label: "Cyberpunk", category: "advanced" },
+  { value: "dark-fantasy", label: "Dark Fantasy", category: "advanced" },
+  { value: "surrealism", label: "AI Surrealism", category: "advanced" },
+  { value: "renaissance", label: "Renaissance Oil", category: "advanced" },
+  { value: "pixel", label: "Pixel Art", category: "advanced" },
+  { value: "ink", label: "Detailed Ink Sketch", category: "advanced" },
+  { value: "isometric", label: "3D Isometric", category: "advanced" },
+  { value: "neon", label: "Neon Glow", category: "advanced" },
+  { value: "holographic", label: "Holographic", category: "advanced" },
+  { value: "retro-future", label: "Retro Futurism", category: "advanced" }
 ];
 
 // Aspect ratio options
@@ -76,12 +117,19 @@ export const aspectRatios = [
   { value: "1:1", label: "Square (1:1)", width: 1024, height: 1024 },
   { value: "16:9", label: "Landscape (16:9)", width: 1024, height: 576 },
   { value: "9:16", label: "Portrait (9:16)", width: 576, height: 1024 },
-  { value: "4:5", label: "Instagram (4:5)", width: 820, height: 1024 },
-  { value: "3:2", label: "Standard (3:2)", width: 1024, height: 683 },
-  { value: "21:9", label: "Ultrawide (21:9)", width: 1024, height: 439 },
-  { value: "2:3", label: "Portrait (2:3)", width: 683, height: 1024 },
   { value: "4:3", label: "Classic (4:3)", width: 1024, height: 768 },
+  { value: "3:4", label: "Portrait (3:4)", width: 768, height: 1024 },
+  { value: "3:2", label: "Standard (3:2)", width: 1024, height: 683 },
+  { value: "2:3", label: "Portrait (2:3)", width: 683, height: 1024 },
+  { value: "4:5", label: "Instagram (4:5)", width: 820, height: 1024 },
 ];
+
+// Image generation parameters
+export const generationParams = {
+  defaultGuidanceScale: 9,
+  defaultSteps: 45,
+  maxBatchSize: 10
+};
 
 // Extended prompt suggestions for better user guidance
 export const promptSuggestions = [
@@ -89,15 +137,15 @@ export const promptSuggestions = [
   "Futuristic cityscape with flying vehicles and neon lights",
   "A magical forest with glowing plants and mythical creatures",
   "An underwater city with bioluminescent architecture",
-  "A cozy cabin in the mountains during autumn",
   "A portrait of a cyberpunk character with neon accents",
   "Ancient temple ruins overgrown with luminescent vines",
   "A steampunk airship hovering over Victorian London",
   "Crystalline palace with rainbow light reflections",
-  "Desert oasis with impossibly tall palm trees at sunset",
-  "A cosmic space station orbiting a multicolored nebula",
+  "Cosmic space station orbiting a multicolored nebula",
   "Floating islands with waterfalls cascading into the sky",
-  "A dreamlike surrealist landscape with melting clocks",
+  "Dreamlike surrealist landscape with melting clocks",
+  "Professional portrait of a futuristic character in 8K",
+  "Hyperrealistic fantasy landscape with dragons"
 ];
 
 // Number of images to generate options - Extended with more options
@@ -106,9 +154,9 @@ export const numberOptions = [
   { value: 2, label: "2 Images" },
   { value: 4, label: "4 Images" },
   { value: 6, label: "6 Images" },
-  { value: 9, label: "9 Images" },
-  { value: 12, label: "12 Images" },
+  { value: 8, label: "8 Images" },
+  { value: 10, label: "10 Images" },
 ];
 
 // Default Hugging Face API Key
-export const DEFAULT_HF_API_KEY = "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";
+export const DEFAULT_HF_API_KEY = "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";

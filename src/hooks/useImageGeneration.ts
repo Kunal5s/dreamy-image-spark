@@ -29,7 +29,13 @@ export const useImageGeneration = (): ImageGenerationHook => {
     numberOfImages,
     setNumberOfImages,
     selectedImageIndex,
-    setSelectedImageIndex
+    setSelectedImageIndex,
+    guidanceScale,
+    setGuidanceScale,
+    steps,
+    setSteps,
+    uniqueHash,
+    resetUniqueHash
   } = useImageState();
 
   const {
@@ -50,7 +56,11 @@ export const useImageGeneration = (): ImageGenerationHook => {
     setImagesLoaded,
     setError,
     numberOfImages,
-    setSelectedImageIndex
+    setSelectedImageIndex,
+    guidanceScale,
+    steps,
+    uniqueHash,
+    resetUniqueHash
   });
 
   return {
@@ -73,6 +83,10 @@ export const useImageGeneration = (): ImageGenerationHook => {
     setNumberOfImages,
     selectedImageIndex,
     setSelectedImageIndex,
+    guidanceScale,
+    setGuidanceScale,
+    steps, 
+    setSteps,
     generateImage,
     handleImageLoad,
     handleCopyPrompt,
