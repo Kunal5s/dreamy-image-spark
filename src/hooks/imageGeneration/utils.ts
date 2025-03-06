@@ -59,6 +59,3 @@ export const enhancePrompt = (prompt: string, style: string): string => {
     
   return `${prompt}, ${styleLabel} style, ${selectedEnhancers}, trending on artstation, award-winning`;
 };
-
-// Re-export the imported functions
-export { getSupportedRatios, generateUniqueHash };
