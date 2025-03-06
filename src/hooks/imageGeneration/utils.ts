@@ -1,16 +1,10 @@
 
-import { models, aspectRatios, styles } from "@/constants/imageGeneratorConstants";
+import { models, aspectRatios, styles, getSupportedRatios, generateUniqueHash } from "@/constants/imageGeneratorConstants";
 
 // Get the model endpoint based on selected model
 export const getModelEndpoint = (selectedModel: string) => {
   const model = models.find(m => m.value === selectedModel);
   return model ? model.endpoint : "stabilityai/sdxl-turbo"; // Default to SDXL Turbo
-};
-
-// Get supported aspect ratios for a model
-export const getSupportedRatios = (selectedModel: string) => {
-  const model = models.find(m => m.value === selectedModel);
-  return model ? model.supportedRatios : ["1:1"]; // Default to square
 };
 
 // Get dimensions based on selected aspect ratio
@@ -64,9 +58,4 @@ export const enhancePrompt = (prompt: string, style: string): string => {
   const styleLabel = styleObj ? styleObj.label : style;
     
   return `${prompt}, ${styleLabel} style, ${selectedEnhancers}, trending on artstation, award-winning`;
-};
-
-// Generate a unique hash for each request to prevent duplicate images
-export const generateUniqueHash = () => {
-  return Date.now().toString(36) + Math.random().toString(36).substring(2);
 };

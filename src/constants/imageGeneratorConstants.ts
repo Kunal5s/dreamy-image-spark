@@ -160,3 +160,20 @@ export const numberOptions = [
 
 // Default Hugging Face API Key
 export const DEFAULT_HF_API_KEY = "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";
+
+// Add the missing functions that are being imported
+
+/**
+ * Gets the supported aspect ratios for a specific model
+ */
+export const getSupportedRatios = (selectedModel: string): string[] => {
+  const model = models.find(m => m.value === selectedModel);
+  return model ? model.supportedRatios : ["1:1"]; // Default to square if model not found
+};
+
+/**
+ * Generates a unique hash for image generation requests
+ */
+export const generateUniqueHash = (): string => {
+  return Date.now().toString(36) + Math.random().toString(36).substring(2);
+};
